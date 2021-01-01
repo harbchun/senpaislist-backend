@@ -26,6 +26,13 @@ services:
       ## uncomment next line to set an admin secret
       # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
 
+  backend:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - "./:/go/src/app"
+
 volumes:
   db_data:
 
