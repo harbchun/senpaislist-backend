@@ -78,7 +78,7 @@ INSERT INTO anime VALUES
     -- Fall 2020
     ('Jujutsu Kaisen (TV)', '呪術廻戦', 'TV', 'Manga', '2020-10-03T00:00:00+00:00', NULL, 
     '{"Action", "Demons", "Supernatural", "School", "Shounen"}',
-    'Fall', 2020, TRUE, 'Currently Airing', 24, '23 min per ep', 'Saturdays at 01:25 (JST)', 'Tue, 19 Jan 2021 05:39:18 +0900'
+    'Fall', 2020, TRUE, 'Currently Airing', 24, '23 min per ep', 'Saturdays at 01:25 (JST)', 'Tue, 19 Jan 2021 05:39:18 +0900',
     8.48, 118870, 106, 259, 8877, 'https://cdn.myanimelist.net/images/anime/1171/109222.jpg'),
     
     ('Haikyuu!!: To the Top 2nd Season', 'ハイキュー!! TO THE TOP', 'TV', 'Manga', '2020-10-03T00:00:00+00:00', '2020-12-19T00:00:00+00:00', 
