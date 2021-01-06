@@ -4,4 +4,8 @@ createdb:
 dropdb:
     docker exec -it senpaislist-backend_postgres_1 dropdb anime
 
-.PHONY: createdb dropdb
+sqlc:
+    sqlc generate
+
+.PHONY: 
+    createdb dropdb sqlc

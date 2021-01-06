@@ -14,21 +14,26 @@
 
 CREATE TABLE "anime" (
     "title" TEXT,
+    "title_jp" TEXT,
     "type" text,
     "source" TEXT, 
     "begin_date" text,
     "end_date" text,
-    "premiered_season" text,
+    "genre" text[],
+    "season" text,
+    "year" INT,
     "airing" boolean,
     "current_status" text,
     "num_episodes" integer,
     "episode_duration" text,
     "broadcast_time" text,
+    "next_broadcast" text,
     "score" FLOAT,
     "scored_by" INT,
     "rank" INT,
     "popularity" INT,
-    "favorites" INT, 
+    "favorites" INT,
+    "image_url" TEXT, 
     "id" bigserial PRIMARY KEY,
     "created_at" timestamptz NOT NULL DEFAULT (now())
 );
