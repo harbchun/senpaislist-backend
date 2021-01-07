@@ -1,7 +1,7 @@
 CREATE TABLE "anime" (
     "title" TEXT,
     "title_jp" TEXT,
-    "type" text,
+    "show_type" text,
     "source" TEXT, 
     "begin_date" text,
     "end_date" text,

@@ -2,7 +2,7 @@
 INSERT INTO anime (
     title,
     title_jp,
-    type,
+    show_type,
     source, 
     begin_date,
     end_date,

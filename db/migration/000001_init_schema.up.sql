@@ -1,6 +1,6 @@
 -- CREATE TABLE "users" (
 --   "id" bigserial PRIMARY KEY,
---   "user_name" text NOT NULL,
+--   "user_name" VARCHAR NOT NULL,
 --   "created_at" timestamptz NOT NULL DEFAULT (now())
 -- );
 
@@ -8,32 +8,32 @@
 --   "id" bigserial PRIMARY KEY,
 --   "account_id" bigint,
 --   "anime_id" bigint,
---   "type" text NOT NULL,
+--   "type" VARCHAR NOT NULL,
 --   "created_at" timestamptz NOT NULL DEFAULT (now())
 -- );
 
 CREATE TABLE "anime" (
-    "title" TEXT,
-    "title_jp" TEXT,
-    "type" text,
-    "source" TEXT, 
-    "begin_date" text,
-    "end_date" text,
-    "genre" text[],
-    "season" text,
-    "year" INT,
-    "airing" boolean,
-    "current_status" text,
-    "num_episodes" integer,
-    "episode_duration" text,
-    "broadcast_time" text,
-    "next_broadcast" text,
-    "score" FLOAT,
-    "scored_by" INT,
-    "rank" INT,
-    "popularity" INT,
-    "favorites" INT,
-    "image_url" TEXT, 
+    "title" VARCHAR NOT NULL,
+    "title_jp" VARCHAR NOT NULL,
+    "show_type" VARCHAR NOT NULL,
+    "source" VARCHAR NOT NULL, 
+    "begin_date" VARCHAR NOT NULL,
+    "end_date" VARCHAR,
+    "genre" VARCHAR[],
+    "season" VARCHAR NOT NULL,
+    "year" BIGINT NOT NULL,
+    "airing" BOOLEAN NOT NULL,
+    "current_status" VARCHAR NOT NULL,
+    "num_episodes" BIGINT NOT NULL,
+    "episode_duration" VARCHAR NOT NULL,
+    "broadcast_time" VARCHAR NOT NULL,
+    "next_broadcast" VARCHAR,
+    "score" FLOAT NOT NULL,
+    "scored_by" BIGINT NOT NULL,
+    "rank" BIGINT NOT NULL,
+    "popularity" BIGINT NOT NULL,
+    "favorites" BIGINT NOT NULL,
+    "image_url" VARCHAR NOT NULL, 
     "id" bigserial PRIMARY KEY,
     "created_at" timestamptz NOT NULL DEFAULT (now())
 );

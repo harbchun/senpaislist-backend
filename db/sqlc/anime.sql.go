@@ -14,7 +14,7 @@ const createAnime = `-- name: CreateAnime :one
 INSERT INTO anime (
     title,
     title_jp,
-    type,
+    show_type,
     source, 
     begin_date,
     end_date,
@@ -35,38 +35,38 @@ INSERT INTO anime (
     image_url
 ) VALUES (
     $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21
-) RETURNING title, title_jp, type, source, begin_date, end_date, genre, season, year, airing, current_status, num_episodes, episode_duration, broadcast_time, next_broadcast, score, scored_by, rank, popularity, favorites, image_url, id, created_at
+) RETURNING title, title_jp, show_type, source, begin_date, end_date, genre, season, year, airing, current_status, num_episodes, episode_duration, broadcast_time, next_broadcast, score, scored_by, rank, popularity, favorites, image_url, id, created_at
 `
 
 type CreateAnimeParams struct {
-	Title           sql.NullString  `json:"title"`
-	TitleJp         sql.NullString  `json:"title_jp"`
-	Type            sql.NullString  `json:"type"`
-	Source          sql.NullString  `json:"source"`
-	BeginDate       sql.NullString  `json:"begin_date"`
-	EndDate         sql.NullString  `json:"end_date"`
-	Genre           []string        `json:"genre"`
-	Season          sql.NullString  `json:"season"`
-	Year            sql.NullInt32   `json:"year"`
-	Airing          sql.NullBool    `json:"airing"`
-	CurrentStatus   sql.NullString  `json:"current_status"`
-	NumEpisodes     sql.NullInt32   `json:"num_episodes"`
-	EpisodeDuration sql.NullString  `json:"episode_duration"`
-	BroadcastTime   sql.NullString  `json:"broadcast_time"`
-	NextBroadcast   sql.NullString  `json:"next_broadcast"`
-	Score           sql.NullFloat64 `json:"score"`
-	ScoredBy        sql.NullInt32   `json:"scored_by"`
-	Rank            sql.NullInt32   `json:"rank"`
-	Popularity      sql.NullInt32   `json:"popularity"`
-	Favorites       sql.NullInt32   `json:"favorites"`
-	ImageUrl        sql.NullString  `json:"image_url"`
+	Title           string         `json:"title"`
+	TitleJp         string         `json:"title_jp"`
+	ShowType        string         `json:"show_type"`
+	Source          string         `json:"source"`
+	BeginDate       string         `json:"begin_date"`
+	EndDate         sql.NullString `json:"end_date"`
+	Genre           []string       `json:"genre"`
+	Season          string         `json:"season"`
+	Year            int64          `json:"year"`
+	Airing          bool           `json:"airing"`
+	CurrentStatus   string         `json:"current_status"`
+	NumEpisodes     int64          `json:"num_episodes"`
+	EpisodeDuration string         `json:"episode_duration"`
+	BroadcastTime   string         `json:"broadcast_time"`
+	NextBroadcast   sql.NullString `json:"next_broadcast"`
+	Score           float64        `json:"score"`
+	ScoredBy        int64          `json:"scored_by"`
+	Rank            int64          `json:"rank"`
+	Popularity      int64          `json:"popularity"`
+	Favorites       int64          `json:"favorites"`
+	ImageUrl        string         `json:"image_url"`
 }
 
 func (q *Queries) CreateAnime(ctx context.Context, arg CreateAnimeParams) (Anime, error) {
 	row := q.db.QueryRowContext(ctx, createAnime,
 		arg.Title,
 		arg.TitleJp,
-		arg.Type,
+		arg.ShowType,
 		arg.Source,
 		arg.BeginDate,
 		arg.EndDate,
@@ -90,7 +90,7 @@ func (q *Queries) CreateAnime(ctx context.Context, arg CreateAnimeParams) (Anime
 	err := row.Scan(
 		&i.Title,
 		&i.TitleJp,
-		&i.Type,
+		&i.ShowType,
 		&i.Source,
 		&i.BeginDate,
 		&i.EndDate,
