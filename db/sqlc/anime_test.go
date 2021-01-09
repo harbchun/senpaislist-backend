@@ -10,8 +10,8 @@ import (
 
 func TestCreateAnime(t *testing.T) {
 	arg := CreateAnimeParams{
-		Title:           "Jujutsu Kaisen (TV)",
-		TitleJp:         "呪術廻戦",
+		Title:           "Jujutsu Kaisen (TV) test",
+		TitleJp:         "呪術廻戦 test",
 		ShowType:        "TV",
 		Source:          "Manga",
 		BeginDate:       "2020-10-03T00:00:00+00:00",
@@ -36,7 +36,7 @@ func TestCreateAnime(t *testing.T) {
 	// testQueries is declared in main_test.go
 	anime, err := testQueries.CreateAnime(context.Background(), arg)
 
-	require.NoError(t, err)    // check error is not nill
+	require.NoError(t, err)    // check error is not nil
 	require.NotEmpty(t, anime) // check the return value is not empty object
 
 	// check inputs matches the ouput

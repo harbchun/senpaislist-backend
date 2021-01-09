@@ -7,11 +7,14 @@ services:
       - db_data:/var/lib/postgresql/data
       - ./db/docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
     environment:
-      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: championsclub123
     networks:
       senpaislist-network:
           aliases:
               - postgres
+    ports: 
+      - 5432:5432
 
   graphql-engine:
     image: hasura/graphql-engine:v1.3.3
@@ -21,7 +24,7 @@ services:
     - "postgres"
     restart: always
     environment:
-      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/postgres
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:championsclub123@postgres:5432/postgres
       ## enable the console served by server
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
       ## enable debugging mode. It is recommended to disable this in production
@@ -34,6 +37,7 @@ services:
           aliases:
               - graphql
 
+<<<<<<< HEAD
   backend:
     build: .
     ports:
@@ -44,6 +48,14 @@ services:
       senpaislist-network:
           aliases:
               - backend
+=======
+  # backend:
+  #   build: .
+  #   ports:
+  #     - "5000:5000"
+  #   volumes:
+  #     - "./:/go/src/app"
+>>>>>>> Finish first basic testing file structure
 
 volumes:
   db_data:
