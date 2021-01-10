@@ -5,15 +5,16 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/harrisonwjs/senpaislist-backend/util"
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateAnime(t *testing.T) {
+func createRandomAnime(t *testing.T) {
 	arg := CreateAnimeParams{
-		Title:           "Jujutsu Kaisen (TV) test",
-		TitleJp:         "呪術廻戦 test",
+		Title:           util.RandomTitle(),
+		TitleJp:         util.RandomJapaneseTitle(),
 		ShowType:        "TV",
-		Source:          "Manga",
+		Source:          util.RandomSource(),
 		BeginDate:       "2020-10-03T00:00:00+00:00",
 		EndDate:         sql.NullString{String: "", Valid: false},
 		Genre:           []string{"Action", "Demons", "Supernatural", "School", "Shounen"},
@@ -87,4 +88,8 @@ func TestCreateAnime(t *testing.T) {
 
 	require.NotZero(t, anime.ID)
 	require.NotZero(t, anime.CreatedAt)
+}
+
+func TestCreateAnime(t *testing.T) {
+	createRandomAnime(t)
 }

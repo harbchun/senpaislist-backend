@@ -1,4 +1,4 @@
-CREATE TABLE "anime" (
+CREATE TABLE "seed" (
     "title" TEXT,
     "title_jp" TEXT,
     "show_type" text,
@@ -24,7 +24,7 @@ CREATE TABLE "anime" (
     "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-INSERT INTO anime VALUES
+INSERT INTO seed VALUES
     ('Yakusoku no Neverland', '約束のネバーランド', 'TV', 'Manga', '2019-01-10T00:00:00+00:00', '2019-03-29T00:00:00+00:00', 
     '{"Sci-Fi", "Mystery", "Horror", "Psychological", "Thriller"}',
     'Winter', 2019, FALSE, 'Finished Airing', 12, '22 min per ep', 'Fridays at 00:55 (JST)', NULL,
