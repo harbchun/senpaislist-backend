@@ -1,33 +1,36 @@
 package api
 
 import (
-	"database/sql"
-
 	"github.com/gin-gonic/gin"
 )
 
 type CreateAnimeParams struct {
-	Title           string         `json:"title" binding:"required"`
-	TitleJp         string         `json:"title_jp" binding:"required"`
-	ShowType        string         `json:"show_type" binding:"required"`
-	Source          string         `json:"source" binding: "required"`
-	BeginDate       string         `json:"begin_date" binding: "required"`
-	EndDate         sql.NullString `json:"end_date"`
-	Genre           []string       `json:"genre" binding: "required"`
-	Season          string         `json:"season" binding: "required, oneof=Spring Summer Winter Fall"`
-	Year            int64          `json:"year" binding: "required"`
-	Airing          bool           `json:"airing" binding: "required"`
-	CurrentStatus   string         `json:"current_status" binding: "required"`
-	NumEpisodes     int64          `json:"num_episodes" binding: "required"`
-	EpisodeDuration string         `json:"episode_duration" binding: "required"`
-	BroadcastTime   string         `json:"broadcast_time" binding: "required"`
-	NextBroadcast   sql.NullString `json:"next_broadcast"`
-	Score           float64        `json:"score" binding: "required"`
-	ScoredBy        int64          `json:"scored_by" binding: "required"`
-	Rank            int64          `json:"rank" binding: "required"`
-	Popularity      int64          `json:"popularity" binding: "required"`
-	Favorites       int64          `json:"favorites" binding: "required"`
-	ImageUrl        string         `json:"image_url" binding: "required"`
+	Title           string   `json:"title"`
+	TitleJp         string   `json:"title_jp"`
+	StartDay        int64    `json:"start_day"`
+	StartMonth      int64    `json:"start_month"`
+	StartYear       int64    `json:"start_year"`
+	EndDay          int64    `json:"end_day"`
+	EndMonth        int64    `json:"end_month"`
+	EndYear         int64    `json:"end_year"`
+	Source          string   `json:"source"`
+	Studio          string   `json:"studio"`
+	Genres          []string `json:"genres"`
+	Rating          string   `json:"rating"`
+	Description     string   `json:"description"`
+	Season          string   `json:"season"`
+	Year            string   `json:"year"`
+	NumEpisodes     int64    `json:"num_episodes"`
+	EpisodeDuration string   `json:"episode_duration"`
+	Airing          bool     `json:"airing"`
+	CurrentStatus   string   `json:"current_status"`
+	NextBroadcast   string   `json:"next_broadcast"`
+	Score           float64  `json:"score"`
+	ScoredBy        int64    `json:"scored_by"`
+	Rank            int64    `json:"rank"`
+	Popularity      int64    `json:"popularity"`
+	Favorites       int64    `json:"favorites"`
+	ImageUrl        string   `json:"image_url"`
 }
 
 func (server *Server) createAnime(ctx *gin.Context) {

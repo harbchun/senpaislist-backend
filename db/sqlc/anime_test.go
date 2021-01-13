@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"strconv"
 	"testing"
 
 	"github.com/harrisonwjs/senpaislist-backend/util"
@@ -27,7 +28,7 @@ func createRandomAnime(t *testing.T) {
 		Rating:          "R",
 		Description:     util.RandomDescription(),
 		Season:          util.RandomSeason(),
-		Year:            string(util.RandomYear()),
+		Year:            strconv.FormatInt(util.RandomYear(), 10),
 		NumEpisodes:     util.RandomNumEpisodes(),
 		EpisodeDuration: "23 min per ep",
 		Airing:          true,
