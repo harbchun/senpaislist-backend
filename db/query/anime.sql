@@ -2,18 +2,23 @@
 INSERT INTO anime (
     title,
     title_jp,
-    show_type,
+    start_day,
+    start_month,
+    start_year,
+    end_day,
+    end_month,
+    end_year,
     source, 
-    begin_date,
-    end_date,
-    genre,
+    studio,
+    genres,
+    rating,
+    description,
     season,
     year,
-    airing,
-    current_status,
     num_episodes,
     episode_duration,
-    broadcast_time,
+    airing,
+    current_status,
     next_broadcast,
     score,
     scored_by,
@@ -22,5 +27,7 @@ INSERT INTO anime (
     favorites,
     image_url
 ) VALUES (
-    $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21
+    $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
+    $11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
+    $21,$22,$23,$24,$25,$26
 ) RETURNING *;

@@ -5,7 +5,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/lib/pq"
 )
@@ -14,18 +13,23 @@ const createAnime = `-- name: CreateAnime :one
 INSERT INTO anime (
     title,
     title_jp,
-    show_type,
+    start_day,
+    start_month,
+    start_year,
+    end_day,
+    end_month,
+    end_year,
     source, 
-    begin_date,
-    end_date,
-    genre,
+    studio,
+    genres,
+    rating,
+    description,
     season,
     year,
-    airing,
-    current_status,
     num_episodes,
     episode_duration,
-    broadcast_time,
+    airing,
+    current_status,
     next_broadcast,
     score,
     scored_by,
@@ -34,50 +38,62 @@ INSERT INTO anime (
     favorites,
     image_url
 ) VALUES (
-    $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21
-) RETURNING title, title_jp, show_type, source, begin_date, end_date, genre, season, year, airing, current_status, num_episodes, episode_duration, broadcast_time, next_broadcast, score, scored_by, rank, popularity, favorites, image_url, id, created_at
+    $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
+    $11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
+    $21,$22,$23,$24,$25,$26
+) RETURNING title, title_jp, start_day, start_month, start_year, end_day, end_month, end_year, source, studio, genres, rating, description, season, year, num_episodes, episode_duration, airing, current_status, next_broadcast, score, scored_by, rank, popularity, favorites, image_url, id, created_at
 `
 
 type CreateAnimeParams struct {
-	Title           string         `json:"title"`
-	TitleJp         string         `json:"title_jp"`
-	ShowType        string         `json:"show_type"`
-	Source          string         `json:"source"`
-	BeginDate       string         `json:"begin_date"`
-	EndDate         sql.NullString `json:"end_date"`
-	Genre           []string       `json:"genre"`
-	Season          string         `json:"season"`
-	Year            int64          `json:"year"`
-	Airing          bool           `json:"airing"`
-	CurrentStatus   string         `json:"current_status"`
-	NumEpisodes     int64          `json:"num_episodes"`
-	EpisodeDuration string         `json:"episode_duration"`
-	BroadcastTime   string         `json:"broadcast_time"`
-	NextBroadcast   sql.NullString `json:"next_broadcast"`
-	Score           float64        `json:"score"`
-	ScoredBy        int64          `json:"scored_by"`
-	Rank            int64          `json:"rank"`
-	Popularity      int64          `json:"popularity"`
-	Favorites       int64          `json:"favorites"`
-	ImageUrl        string         `json:"image_url"`
+	Title           string   `json:"title"`
+	TitleJp         string   `json:"title_jp"`
+	StartDay        int64    `json:"start_day"`
+	StartMonth      int64    `json:"start_month"`
+	StartYear       int64    `json:"start_year"`
+	EndDay          int64    `json:"end_day"`
+	EndMonth        int64    `json:"end_month"`
+	EndYear         int64    `json:"end_year"`
+	Source          string   `json:"source"`
+	Studio          string   `json:"studio"`
+	Genres          []string `json:"genres"`
+	Rating          string   `json:"rating"`
+	Description     string   `json:"description"`
+	Season          string   `json:"season"`
+	Year            string   `json:"year"`
+	NumEpisodes     int64    `json:"num_episodes"`
+	EpisodeDuration string   `json:"episode_duration"`
+	Airing          bool     `json:"airing"`
+	CurrentStatus   string   `json:"current_status"`
+	NextBroadcast   string   `json:"next_broadcast"`
+	Score           float64  `json:"score"`
+	ScoredBy        int64    `json:"scored_by"`
+	Rank            int64    `json:"rank"`
+	Popularity      int64    `json:"popularity"`
+	Favorites       int64    `json:"favorites"`
+	ImageUrl        string   `json:"image_url"`
 }
 
 func (q *Queries) CreateAnime(ctx context.Context, arg CreateAnimeParams) (Anime, error) {
 	row := q.db.QueryRowContext(ctx, createAnime,
 		arg.Title,
 		arg.TitleJp,
-		arg.ShowType,
+		arg.StartDay,
+		arg.StartMonth,
+		arg.StartYear,
+		arg.EndDay,
+		arg.EndMonth,
+		arg.EndYear,
 		arg.Source,
-		arg.BeginDate,
-		arg.EndDate,
-		pq.Array(arg.Genre),
+		arg.Studio,
+		pq.Array(arg.Genres),
+		arg.Rating,
+		arg.Description,
 		arg.Season,
 		arg.Year,
-		arg.Airing,
-		arg.CurrentStatus,
 		arg.NumEpisodes,
 		arg.EpisodeDuration,
-		arg.BroadcastTime,
+		arg.Airing,
+		arg.CurrentStatus,
 		arg.NextBroadcast,
 		arg.Score,
 		arg.ScoredBy,
@@ -90,18 +106,23 @@ func (q *Queries) CreateAnime(ctx context.Context, arg CreateAnimeParams) (Anime
 	err := row.Scan(
 		&i.Title,
 		&i.TitleJp,
-		&i.ShowType,
+		&i.StartDay,
+		&i.StartMonth,
+		&i.StartYear,
+		&i.EndDay,
+		&i.EndMonth,
+		&i.EndYear,
 		&i.Source,
-		&i.BeginDate,
-		&i.EndDate,
-		pq.Array(&i.Genre),
+		&i.Studio,
+		pq.Array(&i.Genres),
+		&i.Rating,
+		&i.Description,
 		&i.Season,
 		&i.Year,
-		&i.Airing,
-		&i.CurrentStatus,
 		&i.NumEpisodes,
 		&i.EpisodeDuration,
-		&i.BroadcastTime,
+		&i.Airing,
+		&i.CurrentStatus,
 		&i.NextBroadcast,
 		&i.Score,
 		&i.ScoredBy,
