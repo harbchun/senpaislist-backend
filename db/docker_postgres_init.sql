@@ -5,7 +5,7 @@ CREATE TABLE "seed" (
     "source" TEXT, 
     "begin_date" text,
     "end_date" text,
-    "genre" text[],
+    "genre" VARCHAR[],
     "season" text,
     "year" INT,
     "airing" boolean,
