@@ -8,6 +8,10 @@ services:
       - ./db/docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
     environment:
       POSTGRES_PASSWORD: postgrespassword
+    networks:
+      senpaislist-network:
+          aliases:
+              - postgres
 
   graphql-engine:
     image: hasura/graphql-engine:v1.3.3
@@ -25,6 +29,10 @@ services:
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       ## uncomment next line to set an admin secret
       # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+    networks:
+      senpaislist-network:
+          aliases:
+              - graphql
 
   backend:
     build: .
@@ -32,7 +40,14 @@ services:
       - "5000:5000"
     volumes:
       - "./:/go/src/app"
+    networks:
+      senpaislist-network:
+          aliases:
+              - backend
 
 volumes:
   db_data:
 
+networks:
+  senpaislist-network:
+    external: true
