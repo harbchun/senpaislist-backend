@@ -1,3 +1,9 @@
+dcupbuild:
+	docker-compose up --build -d
+
+dcdownvolume:
+	docker-compose down -v
+
 createdb:
 	docker exec -it senpaislist-backend_postgres_1 createdb -U postgres --owner=postgres senpaislist
 
@@ -16,5 +22,8 @@ migratedown:
 test:
 	go test -v -cover ./...
 
+builddbpy:
+	python ./scripts/builddb.py
+
 .PHONY:
-	createdb dropdb sqlc migrateup migratedown test
+	dcupbuild dcdownvolume createdb dropdb sqlc migrateup migratedown test builddbpy
