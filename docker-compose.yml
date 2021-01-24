@@ -37,7 +37,6 @@ services:
           aliases:
               - graphql
 
-<<<<<<< HEAD
   backend:
     build: .
     ports:
@@ -48,14 +47,6 @@ services:
       senpaislist-network:
           aliases:
               - backend
-=======
-  # backend:
-  #   build: .
-  #   ports:
-  #     - "5000:5000"
-  #   volumes:
-  #     - "./:/go/src/app"
->>>>>>> Finish first basic testing file structure
 
 volumes:
   db_data:
