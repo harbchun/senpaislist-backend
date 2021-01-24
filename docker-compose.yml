@@ -9,6 +9,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: championsclub123
+      POSTGRES_DB: postgres
     networks:
       senpaislist-network:
           aliases:
@@ -41,12 +42,16 @@ services:
     build: .
     ports:
       - "5000:5000"
-    volumes:
-      - "./:/go/src/app"
     networks:
       senpaislist-network:
           aliases:
               - backend
+  scripts:
+    build: ./scripts/
+    ports:
+      - "5001:5001"
+    depends_on:
+    - "postgres"
 
 volumes:
   db_data:

@@ -23,7 +23,7 @@ test:
 	go test -v -cover ./...
 
 builddbpy:
-	python ./scripts/builddb.py
+	docker run -d -p 5001:5001 pyscripts
 
 .PHONY:
 	dcupbuild dcdownvolume createdb dropdb sqlc migrateup migratedown test builddbpy

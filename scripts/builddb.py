@@ -20,7 +20,7 @@ for item in data['rss']['channel']['item']:
     nextAirDateDict[item['title']] = item['pubDate']
 
 # connection to the db
-engine = create_engine('postgres://postgres:championsclub123@localhost:5432/postgres?sslmode=disable')
+engine = create_engine('postgres://postgres:championsclub123@postgres:5432/postgres')
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
@@ -91,7 +91,7 @@ Base.metadata.create_all(engine)
 newSession = Session()
 for year in range(2021, 2022):
     for season in seasons:
-        animeFiles = glob.glob('../db/data/'+str(year)+str(season)+'/*.json')
+        animeFiles = glob.glob('./data/'+str(year)+str(season)+'/*.json')
         for animeFile in animeFiles:
 
             with open(animeFile, 'r') as jsonfile:
