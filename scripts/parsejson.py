@@ -26,6 +26,9 @@ for currYear in range(2010, 2022):
 
                 title = animeData.get("title", 'N/A')
                 title = 'N/A' if not title else title
+                if title and title != 'N/A':
+                    title = title.replace('\"', '')
+                    title = title.replace("'", '')
                 title_jp = animeData.get("title_japanese", 'N/A')
                 title_jp = 'N/A' if not title_jp else title_jp
                 # if title_jp and title_jp != 'N/A':
@@ -50,6 +53,7 @@ for currYear in range(2010, 2022):
                 studio = 'N/A' if not studio else studio
                 if type(studio) is list and studio:
                     studio = studio[0]['name']
+                    studio = studio.replace("'", '')
                 genresDictList = animeData.get("genres", [])
                 genres = [x.get("name", '') for x in genresDictList]
 
@@ -62,7 +66,8 @@ for currYear in range(2010, 2022):
                 description = animeData.get("synopsis", "N/A")
                 description = 'N/A' if not description else description
                 if description and description != 'N/A':
-                    description.replace('/', '"')
+                    description = description.replace('\"', '')
+                    description = description.replace("'", '')
                 year = str(currYear)
                 num_episodes = animeData.get("episodes", 0)
                 num_episodes = 0 if not num_episodes else num_episodes
@@ -99,6 +104,9 @@ for currYear in range(2010, 2022):
                 image_url = animeData.get("image_url", "N/A")
                 image_url = 'N/A' if not image_url else image_url
 
+                if title_jp and title_jp != 'N/A':
+                    title_jp = title_jp.replace('\"', '')
+                    title_jp = title_jp.replace("'", '')
                 newAnime = {
                     'title': title,
                     'title_jp': title_jp,
