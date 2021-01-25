@@ -61,6 +61,8 @@ for currYear in range(2010, 2022):
                 rating = 'N/A' if not rating else rating
                 description = animeData.get("synopsis", "N/A")
                 description = 'N/A' if not description else description
+                if description and description != 'N/A':
+                    description.replace('/', '"')
                 year = str(currYear)
                 num_episodes = animeData.get("episodes", 0)
                 num_episodes = 0 if not num_episodes else num_episodes
