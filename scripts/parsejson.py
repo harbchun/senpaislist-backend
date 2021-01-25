@@ -15,7 +15,8 @@ for item in data['rss']['channel']['item']:
 
 seasons = ['spring', 'summer', 'fall', 'winter']
 
-allAnime = []
+# allAnime = []
+queryString = "INSERT INTO anime VALUES \n\t"
 for currYear in range(2010, 2022):
     for season in seasons:
         animeFiles = glob.glob('../db/data/'+str(currYear)+str(season)+'/*.json')
@@ -27,8 +28,8 @@ for currYear in range(2010, 2022):
                 title = animeData.get("title", 'N/A')
                 title = 'N/A' if not title else title
                 if title and title != 'N/A':
-                    title = title.replace('\"', '')
-                    title = title.replace("'", '')
+                #     title = title.replace('\"', '')
+                    title = title.replace("\'", "\'\'")
                 title_jp = animeData.get("title_japanese", 'N/A')
                 title_jp = 'N/A' if not title_jp else title_jp
                 # if title_jp and title_jp != 'N/A':
@@ -66,8 +67,8 @@ for currYear in range(2010, 2022):
                 description = animeData.get("synopsis", "N/A")
                 description = 'N/A' if not description else description
                 if description and description != 'N/A':
-                    description = description.replace('\"', '')
-                    description = description.replace("'", '')
+                #     description = description.replace('\"', '')
+                    description = description.replace("\'", "\'\'")
                 year = str(currYear)
                 num_episodes = animeData.get("episodes", 0)
                 num_episodes = 0 if not num_episodes else num_episodes
@@ -75,6 +76,7 @@ for currYear in range(2010, 2022):
                 episode_duration = 'N/A' if not episode_duration else episode_duration
                 airing = animeData.get("airing", False)
                 airing = False if not airing else airing
+                airing = 'FALSE' if not airing else 'TRUE'
                 current_status = animeData.get("status", "N/A")
                 current_status = 'N/A' if not current_status else current_status
                 next_broadcast = "N/A"
@@ -105,8 +107,8 @@ for currYear in range(2010, 2022):
                 image_url = 'N/A' if not image_url else image_url
 
                 if title_jp and title_jp != 'N/A':
-                    title_jp = title_jp.replace('\"', '')
-                    title_jp = title_jp.replace("'", '')
+                #     title_jp = title_jp.replace('\"', '')
+                    title_jp = title_jp.replace("\'", "\'\'")
                 newAnime = {
                     'title': title,
                     'title_jp': title_jp,
@@ -135,9 +137,31 @@ for currYear in range(2010, 2022):
                     'favorites': favorites,
                     'image_url': image_url,
                 }
-                allAnime.append(newAnime)
-    
+                queryString += "("
+                queryString += "\'" + title + "\', " + "\'" + title_jp + "\', " + str(start_day) + ", " + str(start_month) + ", " + str(start_year) + ", " + str(end_day) + ", " + str(end_month) + ", " + str(end_year) + "," +  "\n\t"
+                queryString += "\'" + source + "\', " + "\'" + studio + "\', "
+                queryString += "\'{"
+                if genres: 
+                    for genre in genres:
+                        queryString += "\"" + genre + "\", "
+                    queryString = queryString[:-2]
+                queryString += "}\', " + "\'" + rating + "\', " + "\n\t"
+                queryString += "\'" + description + "\', " + "\n\t"
+                queryString += "\'" + season + "\', " + "\'" + year + "\', " + str(num_episodes) + ", " + "\'" + episode_duration + "\', " + airing + ", " + "\'" + current_status + "\', " + "\n\t"
+                queryString += "\'" + next_broadcast + "\'," + "\n\t"
+                queryString += str(score) + ", " + str(scored_by) + ", " + str(rank) + ", " + str(popularity) + ", " + str(favorites) + "," + "\n\t"
+                queryString += "\'" + image_url + "\'"
+                queryString += "),"
+                queryString += "\n\t"
+
+
+                # allAnime.append(newAnime)
+    #     break
+    # break
 # create the directory to store seasons
 # if not os.path.exists('../db/data/'+str(currYear)): os.mkdir('../db/data/'+str(currYear))
-with open('../db/data/seed.json', 'w') as outfile:
-    json.dump(allAnime, outfile, ensure_ascii=False)
+# with open('../db/data/seed.json', 'w') as outfile:
+#     json.dump(allAnime, outfile, ensure_ascii=False)
+queryString[queryString.rfind(',')] = ';'
+with open('../db/data/seed.txt', 'w') as text_file:
+    text_file.write(queryString)
