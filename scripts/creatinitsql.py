@@ -16,7 +16,38 @@ for item in data['rss']['channel']['item']:
 seasons = ['spring', 'summer', 'fall', 'winter']
 
 # allAnime = []
-queryString = "INSERT INTO anime VALUES \n\t"
+queryString = """CREATE TABLE "anime" (
+    "title" varchar NOT NULL,
+    "title_jp" varchar NOT NULL,
+    "start_day" bigint NOT NULL,
+    "start_month" bigint NOT NULL,
+    "start_year" bigint NOT NULL,
+    "end_day" bigint NOT NULL,
+    "end_month" bigint NOT NULL,
+    "end_year" bigint NOT NULL,
+    "source" varchar NOT NULL,
+    "studio" varchar NOT NULL,
+    "genres" varchar[] NOT NULL,
+    "rating" varchar NOT NULL,
+    "description" varchar NOT NULL,
+    "season" varchar NOT NULL,
+    "year" bigint NOT NULL,
+    "num_episodes" bigint NOT NULL,
+    "episode_duration" varchar NOT NULL,
+    "airing" boolean NOT NULL,
+    "current_status" varchar NOT NULL,
+	"broadcast_time" varchar NOT NULL,
+    "next_broadcast" varchar NOT NULL,
+    "score" float NOT NULL,
+    "scored_by" bigint NOT NULL,
+    "rank" bigint NOT NULL,
+    "popularity" bigint NOT NULL,
+    "favorites" bigint NOT NULL,
+    "image_url" varchar NOT NULL,
+    "id" bigserial PRIMARY KEY,
+    "created_at" timestamptz NOT NULL DEFAULT (now())
+); \n
+INSERT INTO anime VALUES \n\t"""
 for currYear in range(2010, 2022):
     for season in seasons:
         animeFiles = glob.glob('../db/data/'+str(currYear)+str(season)+'/*.json')
@@ -67,7 +98,6 @@ for currYear in range(2010, 2022):
                 description = animeData.get("synopsis", "N/A")
                 description = 'N/A' if not description else description
                 if description and description != 'N/A':
-                #     description = description.replace('\"', '')
                     description = description.replace("\'", "\'\'")
                 year = currYear
                 num_episodes = animeData.get("episodes", 0)
@@ -90,7 +120,8 @@ for currYear in range(2010, 2022):
 
                     if int(today.year) <= int(airYear) and int(today.month) <= int(airMonth) and int(today.day) <= int(airDay):
                         next_broadcast = nextAirDateDict[title_jp]
-                    # next_broadcast = nextAirDateDict[title_jp]
+                broadcast_time = animeData.get("broadcast", "N/A")
+                broadcast_time = 'N/A' if not broadcast_time else broadcast_time
 
                 score = animeData.get("score", 0)
                 score = 0 if not score else score
@@ -148,20 +179,16 @@ for currYear in range(2010, 2022):
                 queryString += "}\', " + "\'" + rating + "\', " + "\n\t"
                 queryString += "\'" + description + "\', " + "\n\t"
                 queryString += "\'" + season + "\', " + str(year) + ", " + str(num_episodes) + ", " + "\'" + episode_duration + "\', " + airing + ", " + "\'" + current_status + "\', " + "\n\t"
-                queryString += "\'" + next_broadcast + "\'," + "\n\t"
+                queryString += "\'" + broadcast_time + "\', " + "\'" + next_broadcast + "\'," + "\n\t"
                 queryString += str(score) + ", " + str(scored_by) + ", " + str(rank) + ", " + str(popularity) + ", " + str(favorites) + "," + "\n\t"
                 queryString += "\'" + image_url + "\'"
                 queryString += "),"
                 queryString += "\n\t"
-
-
-                # allAnime.append(newAnime)
+    #         break
     #     break
     # break
-# create the directory to store seasons
-# if not os.path.exists('../db/data/'+str(currYear)): os.mkdir('../db/data/'+str(currYear))
-# with open('../db/data/seed.json', 'w') as outfile:
-#     json.dump(allAnime, outfile, ensure_ascii=False)
-queryString = queryString[:queryString.rfind(',')] + ';' + "\n\t"
-with open('../db/data/seed.txt', 'w') as text_file:
-    text_file.write(queryString)
+
+queryString = queryString[:queryString.rfind(',')] + ';' + "\n"
+
+with open('../db/docker_postgres_init.sql', 'w') as init_file:
+    init_file.write(queryString)
