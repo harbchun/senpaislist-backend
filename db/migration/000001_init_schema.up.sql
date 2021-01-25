@@ -29,7 +29,7 @@ CREATE TABLE "anime" (
     "rating" varchar NOT NULL,
     "description" varchar NOT NULL,
     "season" varchar NOT NULL,
-    "year" varchar NOT NULL,
+    "year" bigint NOT NULL,
     "num_episodes" bigint NOT NULL,
     "episode_duration" varchar NOT NULL,
     "airing" boolean NOT NULL,

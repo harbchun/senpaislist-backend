@@ -69,7 +69,7 @@ for currYear in range(2010, 2022):
                 if description and description != 'N/A':
                 #     description = description.replace('\"', '')
                     description = description.replace("\'", "\'\'")
-                year = str(currYear)
+                year = currYear
                 num_episodes = animeData.get("episodes", 0)
                 num_episodes = 0 if not num_episodes else num_episodes
                 episode_duration = animeData.get("duration", "N/A")
@@ -147,7 +147,7 @@ for currYear in range(2010, 2022):
                     queryString = queryString[:-2]
                 queryString += "}\', " + "\'" + rating + "\', " + "\n\t"
                 queryString += "\'" + description + "\', " + "\n\t"
-                queryString += "\'" + season + "\', " + "\'" + year + "\', " + str(num_episodes) + ", " + "\'" + episode_duration + "\', " + airing + ", " + "\'" + current_status + "\', " + "\n\t"
+                queryString += "\'" + season + "\', " + str(year) + ", " + str(num_episodes) + ", " + "\'" + episode_duration + "\', " + airing + ", " + "\'" + current_status + "\', " + "\n\t"
                 queryString += "\'" + next_broadcast + "\'," + "\n\t"
                 queryString += str(score) + ", " + str(scored_by) + ", " + str(rank) + ", " + str(popularity) + ", " + str(favorites) + "," + "\n\t"
                 queryString += "\'" + image_url + "\'"
@@ -162,6 +162,6 @@ for currYear in range(2010, 2022):
 # if not os.path.exists('../db/data/'+str(currYear)): os.mkdir('../db/data/'+str(currYear))
 # with open('../db/data/seed.json', 'w') as outfile:
 #     json.dump(allAnime, outfile, ensure_ascii=False)
-queryString[queryString.rfind(',')] = ';'
+queryString = queryString[:queryString.rfind(',')] + ';' + "\n\t"
 with open('../db/data/seed.txt', 'w') as text_file:
     text_file.write(queryString)
