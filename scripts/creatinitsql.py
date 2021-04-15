@@ -5,13 +5,13 @@ import urllib3
 import xmltodict
 
 # next air date xml file
-xml_url = "http://cal.syoboi.jp/proginfo.xml"
+xml_url = "http://cal.syoboi.jp/db.php?Command=TitleLookup&TID=*&Fields=TID,Title"
 http = urllib3.PoolManager()
 response = http.request('GET', xml_url)
 data = xmltodict.parse(response.data)
-nextAirDateDict = {}
-for item in data['rss']['channel']['item']:
-    nextAirDateDict[item['title']] = item['pubDate']
+tidDict = {}
+for item in data['TitleLookupResponse']['TitleItems']['TitleItem']:
+    tidDict[item['Title']] = item['TID']
 
 seasons = ['spring', 'summer', 'fall', 'winter']
 
@@ -48,7 +48,7 @@ queryString = """CREATE TABLE "anime" (
     "created_at" timestamptz NOT NULL DEFAULT (now())
 ); \n
 INSERT INTO anime VALUES \n\t"""
-for currYear in range(2010, 2022):
+for currYear in range(2021, 2022):
     for season in seasons:
         animeFiles = glob.glob('../db/data/'+str(currYear)+str(season)+'/*.json')
         for animeFile in animeFiles:
@@ -110,16 +110,12 @@ for currYear in range(2010, 2022):
                 current_status = animeData.get("status", "N/A")
                 current_status = 'N/A' if not current_status else current_status
                 next_broadcast = "N/A"
-                if currYear == 2021 and title_jp in nextAirDateDict:
-                    airDate = nextAirDateDict[title_jp]
-                    airDateSplit = airDate.split()
-                    airYear = airDateSplit[3]
-                    airMonth = 1
-                    airDay = airDateSplit[1]
-                    today = datetime.datetime.now()
-
-                    if int(today.year) <= int(airYear) and int(today.month) <= int(airMonth) and int(today.day) <= int(airDay):
-                        next_broadcast = nextAirDateDict[title_jp]
+                
+                if title_jp in tidDict:
+                    tid = tidDict[title_jp]
+                else:
+                    tid = 0
+                    
                 broadcast_time = animeData.get("broadcast", "N/A")
                 broadcast_time = 'N/A' if not broadcast_time else broadcast_time
 
@@ -169,7 +165,7 @@ for currYear in range(2010, 2022):
                     'image_url': image_url,
                 }
                 queryString += "("
-                queryString += "\'" + title + "\', " + "\'" + title_jp + "\', " + str(start_day) + ", " + str(start_month) + ", " + str(start_year) + ", " + str(end_day) + ", " + str(end_month) + ", " + str(end_year) + "," +  "\n\t"
+                queryString += "\'" + title + "\', " + "\'" + title_jp + "\', " + str(tid) + ", " + str(start_day) + ", " + str(start_month) + ", " + str(start_year) + ", " + str(end_day) + ", " + str(end_month) + ", " + str(end_year) + "," +  "\n\t"
                 queryString += "\'" + source + "\', " + "\'" + studio + "\', "
                 queryString += "\'{"
                 if genres: 
