@@ -14,41 +14,21 @@ for item in data['TitleLookupResponse']['TitleItems']['TitleItem']:
     tidDict[item['Title']] = item['TID']
 
 seasons = ['spring', 'summer', 'fall', 'winter']
+current_year = 2021
+current_season = 1
 
-# allAnime = []
-queryString = """CREATE TABLE "anime" (
-    "title" varchar NOT NULL,
-    "title_jp" varchar NOT NULL,
-    "start_day" bigint NOT NULL,
-    "start_month" bigint NOT NULL,
-    "start_year" bigint NOT NULL,
-    "end_day" bigint NOT NULL,
-    "end_month" bigint NOT NULL,
-    "end_year" bigint NOT NULL,
-    "source" varchar NOT NULL,
-    "studio" varchar NOT NULL,
-    "genres" varchar[] NOT NULL,
-    "rating" varchar NOT NULL,
-    "description" varchar NOT NULL,
-    "season" varchar NOT NULL,
-    "year" bigint NOT NULL,
-    "num_episodes" bigint NOT NULL,
-    "episode_duration" varchar NOT NULL,
-    "airing" boolean NOT NULL,
-    "current_status" varchar NOT NULL,
-	"broadcast_time" varchar NOT NULL,
-    "next_broadcast" varchar NOT NULL,
-    "score" float NOT NULL,
-    "scored_by" bigint NOT NULL,
-    "rank" bigint NOT NULL,
-    "popularity" bigint NOT NULL,
-    "favorites" bigint NOT NULL,
-    "image_url" varchar NOT NULL,
-    "id" bigserial PRIMARY KEY,
-    "created_at" timestamptz NOT NULL DEFAULT (now())
-); \n
-INSERT INTO anime VALUES \n\t"""
-for currYear in range(2021, 2022):
+seasonDict = {
+    'spring': 1,
+    'summer': 2,
+    'fall': 3,
+    'winter': 4
+}
+
+animeInsert = 'INSERT INTO anime VALUES \n\t'
+
+airInsert = 'INSERT INTO air_date VALUES \n\t'
+
+for currYear in range(2010, 2022):
     for season in seasons:
         animeFiles = glob.glob('../db/data/'+str(currYear)+str(season)+'/*.json')
         for animeFile in animeFiles:
@@ -59,13 +39,9 @@ for currYear in range(2021, 2022):
                 title = animeData.get("title", 'N/A')
                 title = 'N/A' if not title else title
                 if title and title != 'N/A':
-                #     title = title.replace('\"', '')
                     title = title.replace("\'", "\'\'")
                 title_jp = animeData.get("title_japanese", 'N/A')
                 title_jp = 'N/A' if not title_jp else title_jp
-                # if title_jp and title_jp != 'N/A':
-                    
-
                 start_day = animeData.get("aired", {}).get("prop", {}).get("from", {}).get("day", 0)
                 start_day = 0 if not start_day else start_day
                 start_month = animeData.get("aired", {}).get("prop", {}).get("from", {}).get("month", 0)
@@ -78,7 +54,6 @@ for currYear in range(2021, 2022):
                 end_month = 0 if not end_month else end_month
                 end_year = animeData.get("aired", {}).get("prop", {}).get("to", {}).get("year", 0)
                 end_year = 0 if not end_year else end_year
-
                 source = animeData.get("source", "N/A")
                 source = 'N/A' if not source else source
                 studio = animeData.get("studios", 'N/A')
@@ -113,6 +88,26 @@ for currYear in range(2021, 2022):
                 
                 if title_jp in tidDict:
                     tid = tidDict[title_jp]
+
+                    # AIR TIMES
+                    if currYear >= current_year and seasonDict[season] >= current_season:
+                        airInsert += "(" + str(tid) + ", \'{"
+                        progInfoXml = "http://cal.syoboi.jp/db.php?Command=ProgLookup&TID=" + tid
+                        http = urllib3.PoolManager()
+                        progInfoResponse = http.request('GET', progInfoXml)
+                        progInfoData = xmltodict.parse(progInfoResponse.data)
+                        try: 
+                            for item in progInfoData['ProgLookupResponse']['ProgItems']['ProgItem']:
+                                date_time_now = datetime.datetime.now()
+                                date_time_obj = datetime.datetime.strptime(item['StTime'], '%Y-%m-%d %H:%M:%S')
+                                if date_time_obj > date_time_now:
+                                    airInsert += "\"" + item['StTime'] + "\", "
+                        except:
+                            print(tid)
+                        airInsert += "}"
+                        airInsert = airInsert[:airInsert.rfind(', }')] + '}'
+                        airInsert += "\'),\n\t"
+
                 else:
                     tid = 0
                     
@@ -134,57 +129,32 @@ for currYear in range(2021, 2022):
                 image_url = 'N/A' if not image_url else image_url
 
                 if title_jp and title_jp != 'N/A':
-                #     title_jp = title_jp.replace('\"', '')
                     title_jp = title_jp.replace("\'", "\'\'")
-                newAnime = {
-                    'title': title,
-                    'title_jp': title_jp,
-                    'start_day': start_day,
-                    'start_month': start_month,
-                    'start_year': start_year,
-                    'end_day': end_day,
-                    'end_month': end_month,
-                    'end_year': end_year,
-                    'source': source,
-                    'studio': studio,
-                    'genres': genres,
-                    'rating': rating,
-                    'description': description,
-                    'season': season,
-                    'year': year,
-                    'num_episodes': num_episodes,
-                    'episode_duration': episode_duration,
-                    'airing': airing,
-                    'current_status': current_status,
-                    'next_broadcast': next_broadcast,
-                    'score': score,
-                    'scored_by': scored_by,
-                    'rank': rank,
-                    'popularity': popularity,
-                    'favorites': favorites,
-                    'image_url': image_url,
-                }
-                queryString += "("
-                queryString += "\'" + title + "\', " + "\'" + title_jp + "\', " + str(tid) + ", " + str(start_day) + ", " + str(start_month) + ", " + str(start_year) + ", " + str(end_day) + ", " + str(end_month) + ", " + str(end_year) + "," +  "\n\t"
-                queryString += "\'" + source + "\', " + "\'" + studio + "\', "
-                queryString += "\'{"
+
+
+                animeInsert += "("
+                animeInsert += "\'" + title + "\', " + "\'" + title_jp + "\', " + str(tid) + ", " + str(start_day) + ", " + str(start_month) + ", " + str(start_year) + ", " + str(end_day) + ", " + str(end_month) + ", " + str(end_year) + "," +  "\n\t"
+                animeInsert += "\'" + source + "\', " + "\'" + studio + "\', "
+                animeInsert += "\'{"
                 if genres: 
                     for genre in genres:
-                        queryString += "\"" + genre + "\", "
-                    queryString = queryString[:-2]
-                queryString += "}\', " + "\'" + rating + "\', " + "\n\t"
-                queryString += "\'" + description + "\', " + "\n\t"
-                queryString += "\'" + season + "\', " + str(year) + ", " + str(num_episodes) + ", " + "\'" + episode_duration + "\', " + airing + ", " + "\'" + current_status + "\', " + "\n\t"
-                queryString += "\'" + broadcast_time + "\', " + "\'" + next_broadcast + "\'," + "\n\t"
-                queryString += str(score) + ", " + str(scored_by) + ", " + str(rank) + ", " + str(popularity) + ", " + str(favorites) + "," + "\n\t"
-                queryString += "\'" + image_url + "\'"
-                queryString += "),"
-                queryString += "\n\t"
-    #         break
-    #     break
-    # break
+                        animeInsert += "\"" + genre + "\", "
+                    animeInsert = animeInsert[:-2]
+                animeInsert += "}\', " + "\'" + rating + "\', " + "\n\t"
+                animeInsert += "\'" + description + "\', " + "\n\t"
+                animeInsert += "\'" + season + "\', " + str(year) + ", " + str(num_episodes) + ", " + "\'" + episode_duration + "\', " + airing + ", " + "\'" + current_status + "\', " + "\n\t"
+                # animeInsert += "\'" + broadcast_time + "\', " + "\'" + next_broadcast + "\'," + "\n\t"
+                animeInsert += str(score) + ", " + str(scored_by) + ", " + str(rank) + ", " + str(popularity) + ", " + str(favorites) + "," + "\n\t"
+                animeInsert += "\'" + image_url + "\'"
+                animeInsert += "),"
+                animeInsert += "\n\t"
 
-queryString = queryString[:queryString.rfind(',')] + ';' + "\n"
 
-with open('../db/docker_postgres_init.sql', 'w') as init_file:
-    init_file.write(queryString)
+animeInsert = animeInsert[:animeInsert.rfind(',')] + ';' + "\n"
+airInsert = airInsert[:airInsert.rfind(',')] + ';' + "\n"
+
+with open('../db/migration/000002_add_anime.up.sql', 'w') as init_file:
+    init_file.write(animeInsert)
+
+with open('../db/migration/000003_add_broadcast_times.up.sql', 'w') as init_file:
+    init_file.write(airInsert)

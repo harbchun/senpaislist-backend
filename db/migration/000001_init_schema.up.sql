@@ -17,6 +17,7 @@ CREATE TABLE "bookmarks" (
 CREATE TABLE "anime" (
     "title" varchar NOT NULL,
     "title_jp" varchar NOT NULL,
+    "tid" bigint NOT NULL,
     "start_day" bigint NOT NULL,
     "start_month" bigint NOT NULL,
     "start_year" bigint NOT NULL,
@@ -28,13 +29,12 @@ CREATE TABLE "anime" (
     "genres" varchar[] NOT NULL,
     "rating" varchar NOT NULL,
     "description" varchar NOT NULL,
-    "season" varchar NOT NULL,
+    "season_id" varchar NOT NULL,
     "year" bigint NOT NULL,
     "num_episodes" bigint NOT NULL,
     "episode_duration" varchar NOT NULL,
     "airing" boolean NOT NULL,
     "current_status" varchar NOT NULL,
-    "next_broadcast" varchar NOT NULL,
     "score" float NOT NULL,
     "scored_by" bigint NOT NULL,
     "rank" bigint NOT NULL,
@@ -44,6 +44,20 @@ CREATE TABLE "anime" (
     "id" bigserial PRIMARY KEY,
     "created_at" timestamptz NOT NULL DEFAULT (now())
 );
+
+CREATE TABLE "broadcast_times" (
+    "tid" bigint NOT NULL,
+    "times" varchar[] NOT NULL
+);
+
+CREATE TABLE "seasons" (
+    "season_id" varchar NOT NULL,
+    "season_name" varchar NOT NULL,
+    "start_month" smallint NOT NULL,
+    "end_month" smallint NOT NULL
+);
+
+
 
 ALTER TABLE "bookmarks" ADD FOREIGN KEY ("owner") REFERENCES "users" ("username");
 
