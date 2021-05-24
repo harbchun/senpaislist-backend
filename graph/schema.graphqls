@@ -1,0 +1,14 @@
+type Anime {
+  id: ID!
+  title: String!
+  titleJp: String!
+  description: String!
+  genres: String!
+  year: Int!
+  imageUrl: String!
+}
+
+type Query {
+  anime(id: ID!): Anime
+  animes(limit: Int): [Anime]
+}
