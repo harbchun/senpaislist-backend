@@ -25,3 +25,9 @@ Access Database:
 ---
  - pgAdmin: localhost:8080 in browser
 ---
+
+Seed Database:
+
+---
+ - docker-compose exec backend make seed
+---
