@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS user_anime_bookmarks(
+CREATE TABLE IF NOT EXISTS users_animes_bookmarks(
    user_id uuid NOT NULL,
    anime_id uuid NOT NULL,
    bookmark_type VARCHAR NOT NULL,
