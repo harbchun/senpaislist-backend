@@ -7,9 +7,6 @@ CREATE TABLE IF NOT EXISTS animes(
    tid bigint NOT NULL,
    source VARCHAR,
    studio VARCHAR,
-   rating VARCHAR,
    summary VARCHAR,
-   rank INT,
-   popularity INT,
    image_url VARCHAR
 );

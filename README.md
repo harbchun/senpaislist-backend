@@ -1,10 +1,3 @@
-download migrate: https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
-
-Python scripts
-> install dependencies:
-    - sqlalchemy
-    - xmltodict
-
 Workflow: 
 
 ---
@@ -24,4 +17,10 @@ Access Database:
 
 ---
  - pgAdmin: localhost:8080 in browser
+---
+
+Seed Database:
+
+---
+ - docker-compose exec backend make seed
 ---

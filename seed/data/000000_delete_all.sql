@@ -1,0 +1,1 @@
+TRUNCATE airing_informations, animes, animes_genres, bookmarks, genres, seasons, statistics, users, users_animes_bookmarks, years;

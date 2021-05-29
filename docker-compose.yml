@@ -20,8 +20,8 @@ services:
     image: dpage/pgadmin4:5.3
     restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@email.com
-      PGADMIN_DEFAULT_PASSWORD: secret
+      PGADMIN_DEFAULT_EMAIL: postgres@email.com
+      PGADMIN_DEFAULT_PASSWORD: championsclub123
       PGADMIN_LISTEN_PORT: 80
     ports:
     - "8080:80"
