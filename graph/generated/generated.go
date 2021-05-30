@@ -42,24 +42,23 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Anime struct {
-		Description func(childComplexity int) int
-		Genres      func(childComplexity int) int
-		ID          func(childComplexity int) int
-		ImageURL    func(childComplexity int) int
-		Title       func(childComplexity int) int
-		TitleJp     func(childComplexity int) int
-		Year        func(childComplexity int) int
+		ID       func(childComplexity int) int
+		ImageURL func(childComplexity int) int
+		Source   func(childComplexity int) int
+		Studio   func(childComplexity int) int
+		Summary  func(childComplexity int) int
+		Tid      func(childComplexity int) int
+		Title    func(childComplexity int) int
+		TitleJp  func(childComplexity int) int
 	}
 
 	Query struct {
-		Anime  func(childComplexity int, id string) int
-		Animes func(childComplexity int, limit *int) int
+		Anime func(childComplexity int, id string) int
 	}
 }
 
 type QueryResolver interface {
 	Anime(ctx context.Context, id string) (*model.Anime, error)
-	Animes(ctx context.Context, limit *int) ([]*model.Anime, error)
 }
 
 type executableSchema struct {
@@ -77,20 +76,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Anime.description":
-		if e.complexity.Anime.Description == nil {
-			break
-		}
-
-		return e.complexity.Anime.Description(childComplexity), true
-
-	case "Anime.genres":
-		if e.complexity.Anime.Genres == nil {
-			break
-		}
-
-		return e.complexity.Anime.Genres(childComplexity), true
-
 	case "Anime.id":
 		if e.complexity.Anime.ID == nil {
 			break
@@ -105,6 +90,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Anime.ImageURL(childComplexity), true
 
+	case "Anime.source":
+		if e.complexity.Anime.Source == nil {
+			break
+		}
+
+		return e.complexity.Anime.Source(childComplexity), true
+
+	case "Anime.studio":
+		if e.complexity.Anime.Studio == nil {
+			break
+		}
+
+		return e.complexity.Anime.Studio(childComplexity), true
+
+	case "Anime.summary":
+		if e.complexity.Anime.Summary == nil {
+			break
+		}
+
+		return e.complexity.Anime.Summary(childComplexity), true
+
+	case "Anime.tid":
+		if e.complexity.Anime.Tid == nil {
+			break
+		}
+
+		return e.complexity.Anime.Tid(childComplexity), true
+
 	case "Anime.title":
 		if e.complexity.Anime.Title == nil {
 			break
@@ -112,19 +125,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Anime.Title(childComplexity), true
 
-	case "Anime.titleJp":
+	case "Anime.title_jp":
 		if e.complexity.Anime.TitleJp == nil {
 			break
 		}
 
 		return e.complexity.Anime.TitleJp(childComplexity), true
-
-	case "Anime.year":
-		if e.complexity.Anime.Year == nil {
-			break
-		}
-
-		return e.complexity.Anime.Year(childComplexity), true
 
 	case "Query.anime":
 		if e.complexity.Query.Anime == nil {
@@ -137,18 +143,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Anime(childComplexity, args["id"].(string)), true
-
-	case "Query.animes":
-		if e.complexity.Query.Animes == nil {
-			break
-		}
-
-		args, err := ec.field_Query_animes_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Animes(childComplexity, args["limit"].(*int)), true
 
 	}
 	return 0, false
@@ -202,17 +196,17 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 var sources = []*ast.Source{
 	{Name: "graph/schema.graphqls", Input: `type Anime {
   id: ID!
+  tid: Int!
   title: String!
-  titleJp: String!
-  description: String!
-  genres: String!
-  year: Int!
+  title_jp: String!
+  summary: String!
+  source: String!
+  studio: String!
   imageUrl: String!
 }
 
 type Query {
   anime(id: ID!): Anime
-  animes(limit: Int): [Anime]
 }
 `, BuiltIn: false},
 }
@@ -249,21 +243,6 @@ func (ec *executionContext) field_Query_anime_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_animes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg0
 	return args, nil
 }
 
@@ -340,6 +319,41 @@ func (ec *executionContext) _Anime_id(ctx context.Context, field graphql.Collect
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Anime_tid(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Anime",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Anime_title(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -375,7 +389,7 @@ func (ec *executionContext) _Anime_title(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Anime_titleJp(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
+func (ec *executionContext) _Anime_title_jp(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -410,7 +424,7 @@ func (ec *executionContext) _Anime_titleJp(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Anime_description(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
+func (ec *executionContext) _Anime_summary(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -428,7 +442,7 @@ func (ec *executionContext) _Anime_description(ctx context.Context, field graphq
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
+		return obj.Summary, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -445,7 +459,7 @@ func (ec *executionContext) _Anime_description(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Anime_genres(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
+func (ec *executionContext) _Anime_source(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -463,7 +477,7 @@ func (ec *executionContext) _Anime_genres(ctx context.Context, field graphql.Col
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Genres, nil
+		return obj.Source, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -480,7 +494,7 @@ func (ec *executionContext) _Anime_genres(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Anime_year(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
+func (ec *executionContext) _Anime_studio(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -498,7 +512,7 @@ func (ec *executionContext) _Anime_year(ctx context.Context, field graphql.Colle
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Year, nil
+		return obj.Studio, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -510,9 +524,9 @@ func (ec *executionContext) _Anime_year(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Anime_imageUrl(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
@@ -586,46 +600,7 @@ func (ec *executionContext) _Query_anime(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(*model.Anime)
 	fc.Result = res
-	return ec.marshalOAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgqlᚑserverᚋgraphᚋmodelᚐAnime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_animes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_animes_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Animes(rctx, args["limit"].(*int))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Anime)
-	fc.Result = res
-	return ec.marshalOAnime2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgqlᚑserverᚋgraphᚋmodelᚐAnime(ctx, field.Selections, res)
+	return ec.marshalOAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1810,28 +1785,33 @@ func (ec *executionContext) _Anime(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "tid":
+			out.Values[i] = ec._Anime_tid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "title":
 			out.Values[i] = ec._Anime_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "titleJp":
-			out.Values[i] = ec._Anime_titleJp(ctx, field, obj)
+		case "title_jp":
+			out.Values[i] = ec._Anime_title_jp(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "description":
-			out.Values[i] = ec._Anime_description(ctx, field, obj)
+		case "summary":
+			out.Values[i] = ec._Anime_summary(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "genres":
-			out.Values[i] = ec._Anime_genres(ctx, field, obj)
+		case "source":
+			out.Values[i] = ec._Anime_source(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "year":
-			out.Values[i] = ec._Anime_year(ctx, field, obj)
+		case "studio":
+			out.Values[i] = ec._Anime_studio(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -1875,17 +1855,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_anime(ctx, field)
-				return res
-			})
-		case "animes":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_animes(ctx, field)
 				return res
 			})
 		case "__type":
@@ -2437,47 +2406,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOAnime2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgqlᚑserverᚋgraphᚋmodelᚐAnime(ctx context.Context, sel ast.SelectionSet, v []*model.Anime) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgqlᚑserverᚋgraphᚋmodelᚐAnime(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalOAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgqlᚑserverᚋgraphᚋmodelᚐAnime(ctx context.Context, sel ast.SelectionSet, v *model.Anime) graphql.Marshaler {
+func (ec *executionContext) marshalOAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnime(ctx context.Context, sel ast.SelectionSet, v *model.Anime) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -2506,21 +2435,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
-}
-
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalInt(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
