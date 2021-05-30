@@ -9,6 +9,7 @@ type Anime {
   imageUrl: String!
   statistic: Statistic!
   airing_information: AiringInformation!
+  anime_genres: [AnimesGenres!]!
 }
 
 type Statistic {
@@ -33,9 +34,35 @@ type AiringInformation {
   airing: Boolean!
 }
 
+type Genre {
+  id: ID!
+  genre: String!
+  animes_genre: [AnimesGenres!]!
+}
+
+type Year {
+  id: ID!
+  year: Int!
+}
+
+type Season {
+  id: ID!
+  season: String!
+}
+
+type AnimesGenres {
+  anime_id: ID!
+  genre: String!
+}
 
 type Query {
   anime(id: ID!): Anime
+  animes(id: ID, title: String): [Anime!]!
   statistic(id: ID!): Statistic
   airingInformation(id: ID!): AiringInformation
+  years: [Year!]!
+  genres: [Genre!]!
+  seasons: [Season!]!
+  anime_genres(id: ID!): [AnimesGenres!]!
+  animes_genre(genre: String!): [AnimesGenres!]!
 }
