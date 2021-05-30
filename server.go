@@ -11,7 +11,9 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/harrisonwjs/senpaislist-backend/database"
 	"github.com/harrisonwjs/senpaislist-backend/graph"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/anime"
 	"github.com/harrisonwjs/senpaislist-backend/graph/generated"
 )
 
@@ -33,7 +35,11 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	db := database.InitDB()
+
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
+		AnimeController: anime.Anime{DB: db},
+	}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
