@@ -8,6 +8,7 @@ import (
 	"errors"
 	"strconv"
 	"sync"
+	"sync/atomic"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -34,6 +35,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Anime() AnimeResolver
 	Query() QueryResolver
 }
 
@@ -42,23 +44,39 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Anime struct {
-		ID       func(childComplexity int) int
-		ImageURL func(childComplexity int) int
-		Source   func(childComplexity int) int
-		Studio   func(childComplexity int) int
-		Summary  func(childComplexity int) int
-		Tid      func(childComplexity int) int
-		Title    func(childComplexity int) int
-		TitleJp  func(childComplexity int) int
+		ID        func(childComplexity int) int
+		ImageURL  func(childComplexity int) int
+		Source    func(childComplexity int) int
+		Statistic func(childComplexity int) int
+		Studio    func(childComplexity int) int
+		Summary   func(childComplexity int) int
+		Tid       func(childComplexity int) int
+		Title     func(childComplexity int) int
+		TitleJp   func(childComplexity int) int
 	}
 
 	Query struct {
-		Anime func(childComplexity int, id string) int
+		Anime     func(childComplexity int, id string) int
+		Statistic func(childComplexity int, id string) int
+	}
+
+	Statistic struct {
+		AnimeID    func(childComplexity int) int
+		Favorites  func(childComplexity int) int
+		Popularity func(childComplexity int) int
+		Rank       func(childComplexity int) int
+		Rating     func(childComplexity int) int
+		Score      func(childComplexity int) int
+		ScoredBy   func(childComplexity int) int
 	}
 }
 
+type AnimeResolver interface {
+	Statistic(ctx context.Context, obj *model.Anime) (*model.Statistic, error)
+}
 type QueryResolver interface {
 	Anime(ctx context.Context, id string) (*model.Anime, error)
+	Statistic(ctx context.Context, id string) (*model.Statistic, error)
 }
 
 type executableSchema struct {
@@ -96,6 +114,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Anime.Source(childComplexity), true
+
+	case "Anime.statistic":
+		if e.complexity.Anime.Statistic == nil {
+			break
+		}
+
+		return e.complexity.Anime.Statistic(childComplexity), true
 
 	case "Anime.studio":
 		if e.complexity.Anime.Studio == nil {
@@ -143,6 +168,67 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Anime(childComplexity, args["id"].(string)), true
+
+	case "Query.statistic":
+		if e.complexity.Query.Statistic == nil {
+			break
+		}
+
+		args, err := ec.field_Query_statistic_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Statistic(childComplexity, args["id"].(string)), true
+
+	case "Statistic.anime_id":
+		if e.complexity.Statistic.AnimeID == nil {
+			break
+		}
+
+		return e.complexity.Statistic.AnimeID(childComplexity), true
+
+	case "Statistic.favorites":
+		if e.complexity.Statistic.Favorites == nil {
+			break
+		}
+
+		return e.complexity.Statistic.Favorites(childComplexity), true
+
+	case "Statistic.popularity":
+		if e.complexity.Statistic.Popularity == nil {
+			break
+		}
+
+		return e.complexity.Statistic.Popularity(childComplexity), true
+
+	case "Statistic.rank":
+		if e.complexity.Statistic.Rank == nil {
+			break
+		}
+
+		return e.complexity.Statistic.Rank(childComplexity), true
+
+	case "Statistic.rating":
+		if e.complexity.Statistic.Rating == nil {
+			break
+		}
+
+		return e.complexity.Statistic.Rating(childComplexity), true
+
+	case "Statistic.score":
+		if e.complexity.Statistic.Score == nil {
+			break
+		}
+
+		return e.complexity.Statistic.Score(childComplexity), true
+
+	case "Statistic.scored_by":
+		if e.complexity.Statistic.ScoredBy == nil {
+			break
+		}
+
+		return e.complexity.Statistic.ScoredBy(childComplexity), true
 
 	}
 	return 0, false
@@ -203,10 +289,22 @@ var sources = []*ast.Source{
   source: String!
   studio: String!
   imageUrl: String!
+  statistic: Statistic!
+}
+
+type Statistic {
+  anime_id: ID!
+  score: Int!
+  scored_by: Int!
+  rank: Int!
+  popularity: Int!
+  favorites: Int!
+  rating: Int!
 }
 
 type Query {
   anime(id: ID!): Anime
+  statistic(id: ID!): Statistic
 }
 `, BuiltIn: false},
 }
@@ -232,6 +330,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 }
 
 func (ec *executionContext) field_Query_anime_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_statistic_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -564,6 +677,41 @@ func (ec *executionContext) _Anime_imageUrl(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Anime_statistic(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Anime",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Anime().Statistic(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Statistic)
+	fc.Result = res
+	return ec.marshalNStatistic2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatistic(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_anime(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -601,6 +749,45 @@ func (ec *executionContext) _Query_anime(ctx context.Context, field graphql.Coll
 	res := resTmp.(*model.Anime)
 	fc.Result = res
 	return ec.marshalOAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_statistic(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_statistic_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Statistic(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Statistic)
+	fc.Result = res
+	return ec.marshalOStatistic2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatistic(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -672,6 +859,251 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Statistic_anime_id(ctx context.Context, field graphql.CollectedField, obj *model.Statistic) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Statistic",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AnimeID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Statistic_score(ctx context.Context, field graphql.CollectedField, obj *model.Statistic) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Statistic",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Score, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Statistic_scored_by(ctx context.Context, field graphql.CollectedField, obj *model.Statistic) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Statistic",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ScoredBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Statistic_rank(ctx context.Context, field graphql.CollectedField, obj *model.Statistic) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Statistic",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rank, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Statistic_popularity(ctx context.Context, field graphql.CollectedField, obj *model.Statistic) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Statistic",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Popularity, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Statistic_favorites(ctx context.Context, field graphql.CollectedField, obj *model.Statistic) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Statistic",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Favorites, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Statistic_rating(ctx context.Context, field graphql.CollectedField, obj *model.Statistic) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Statistic",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rating, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -1783,43 +2215,57 @@ func (ec *executionContext) _Anime(ctx context.Context, sel ast.SelectionSet, ob
 		case "id":
 			out.Values[i] = ec._Anime_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "tid":
 			out.Values[i] = ec._Anime_tid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "title":
 			out.Values[i] = ec._Anime_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "title_jp":
 			out.Values[i] = ec._Anime_title_jp(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "summary":
 			out.Values[i] = ec._Anime_summary(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "source":
 			out.Values[i] = ec._Anime_source(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "studio":
 			out.Values[i] = ec._Anime_studio(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "imageUrl":
 			out.Values[i] = ec._Anime_imageUrl(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
+		case "statistic":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Anime_statistic(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -1857,10 +2303,78 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_anime(ctx, field)
 				return res
 			})
+		case "statistic":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_statistic(ctx, field)
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
 			out.Values[i] = ec._Query___schema(ctx, field)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var statisticImplementors = []string{"Statistic"}
+
+func (ec *executionContext) _Statistic(ctx context.Context, sel ast.SelectionSet, obj *model.Statistic) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, statisticImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Statistic")
+		case "anime_id":
+			out.Values[i] = ec._Statistic_anime_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "score":
+			out.Values[i] = ec._Statistic_score(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "scored_by":
+			out.Values[i] = ec._Statistic_scored_by(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "rank":
+			out.Values[i] = ec._Statistic_rank(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "popularity":
+			out.Values[i] = ec._Statistic_popularity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "favorites":
+			out.Values[i] = ec._Statistic_favorites(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "rating":
+			out.Values[i] = ec._Statistic_rating(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2162,6 +2676,20 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) marshalNStatistic2githubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatistic(ctx context.Context, sel ast.SelectionSet, v model.Statistic) graphql.Marshaler {
+	return ec._Statistic(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNStatistic2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatistic(ctx context.Context, sel ast.SelectionSet, v *model.Statistic) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Statistic(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2435,6 +2963,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
+}
+
+func (ec *executionContext) marshalOStatistic2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatistic(ctx context.Context, sel ast.SelectionSet, v *model.Statistic) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Statistic(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

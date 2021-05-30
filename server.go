@@ -14,6 +14,7 @@ import (
 	"github.com/harrisonwjs/senpaislist-backend/database"
 	"github.com/harrisonwjs/senpaislist-backend/graph"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/anime"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/statistic"
 	"github.com/harrisonwjs/senpaislist-backend/graph/generated"
 )
 
@@ -41,7 +42,8 @@ func main() {
 	db := database.InitDB()
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
-		AnimeController: anime.Anime{DB: db},
+		AnimeController:     anime.Anime{DB: db},
+		StatisticController: statistic.Statistic{DB: db},
 	}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))

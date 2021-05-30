@@ -7,8 +7,20 @@ type Anime {
   source: String!
   studio: String!
   imageUrl: String!
+  statistic: Statistic!
+}
+
+type Statistic {
+  anime_id: ID!
+  score: Int!
+  scored_by: Int!
+  rank: Int!
+  popularity: Int!
+  favorites: Int!
+  rating: Int!
 }
 
 type Query {
   anime(id: ID!): Anime
+  statistic(id: ID!): Statistic
 }

@@ -10,13 +10,29 @@ import (
 	"github.com/harrisonwjs/senpaislist-backend/graph/model"
 )
 
+func (r *animeResolver) Statistic(ctx context.Context, obj *model.Anime) (*model.Statistic, error) {
+	statistic := r.StatisticController.GetStatistic(obj.ID)
+
+	return &statistic, nil
+}
+
 func (r *queryResolver) Anime(ctx context.Context, id string) (*model.Anime, error) {
 	anime := r.AnimeController.GetAnime(id)
 
 	return &anime, nil
 }
 
+func (r *queryResolver) Statistic(ctx context.Context, id string) (*model.Statistic, error) {
+	statistic := r.StatisticController.GetStatistic(id)
+
+	return &statistic, nil
+}
+
+// Anime returns generated.AnimeResolver implementation.
+func (r *Resolver) Anime() generated.AnimeResolver { return &animeResolver{r} }
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+type animeResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
