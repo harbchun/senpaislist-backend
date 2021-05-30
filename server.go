@@ -15,7 +15,11 @@ import (
 	"github.com/harrisonwjs/senpaislist-backend/graph"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/airingInformation"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/anime"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/animesgenres"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/genre"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/season"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/statistic"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/year"
 	"github.com/harrisonwjs/senpaislist-backend/graph/generated"
 )
 
@@ -46,6 +50,10 @@ func main() {
 		AnimeController:             anime.Anime{DB: db},
 		StatisticController:         statistic.Statistic{DB: db},
 		AiringInformationController: airingInformation.AiringInformation{DB: db},
+		GenreController:             genre.Genre{DB: db},
+		YearController:              year.Year{DB: db},
+		SeasonController:            season.Season{DB: db},
+		AnimesGenresController:      animesgenres.AnimesGenres{DB: db},
 	}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
