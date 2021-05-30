@@ -43,21 +43,35 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AiringInformation struct {
+		Airing          func(childComplexity int) int
+		AnimeID         func(childComplexity int) int
+		EpisodeDuration func(childComplexity int) int
+		NumEpisodes     func(childComplexity int) int
+		Season          func(childComplexity int) int
+		StartDay        func(childComplexity int) int
+		StartMonth      func(childComplexity int) int
+		StartYear       func(childComplexity int) int
+		Year            func(childComplexity int) int
+	}
+
 	Anime struct {
-		ID        func(childComplexity int) int
-		ImageURL  func(childComplexity int) int
-		Source    func(childComplexity int) int
-		Statistic func(childComplexity int) int
-		Studio    func(childComplexity int) int
-		Summary   func(childComplexity int) int
-		Tid       func(childComplexity int) int
-		Title     func(childComplexity int) int
-		TitleJp   func(childComplexity int) int
+		AiringInformation func(childComplexity int) int
+		ID                func(childComplexity int) int
+		ImageURL          func(childComplexity int) int
+		Source            func(childComplexity int) int
+		Statistic         func(childComplexity int) int
+		Studio            func(childComplexity int) int
+		Summary           func(childComplexity int) int
+		Tid               func(childComplexity int) int
+		Title             func(childComplexity int) int
+		TitleJp           func(childComplexity int) int
 	}
 
 	Query struct {
-		Anime     func(childComplexity int, id string) int
-		Statistic func(childComplexity int, id string) int
+		AiringInformation func(childComplexity int, id string) int
+		Anime             func(childComplexity int, id string) int
+		Statistic         func(childComplexity int, id string) int
 	}
 
 	Statistic struct {
@@ -73,10 +87,12 @@ type ComplexityRoot struct {
 
 type AnimeResolver interface {
 	Statistic(ctx context.Context, obj *model.Anime) (*model.Statistic, error)
+	AiringInformation(ctx context.Context, obj *model.Anime) (*model.AiringInformation, error)
 }
 type QueryResolver interface {
 	Anime(ctx context.Context, id string) (*model.Anime, error)
 	Statistic(ctx context.Context, id string) (*model.Statistic, error)
+	AiringInformation(ctx context.Context, id string) (*model.AiringInformation, error)
 }
 
 type executableSchema struct {
@@ -93,6 +109,76 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "AiringInformation.airing":
+		if e.complexity.AiringInformation.Airing == nil {
+			break
+		}
+
+		return e.complexity.AiringInformation.Airing(childComplexity), true
+
+	case "AiringInformation.anime_id":
+		if e.complexity.AiringInformation.AnimeID == nil {
+			break
+		}
+
+		return e.complexity.AiringInformation.AnimeID(childComplexity), true
+
+	case "AiringInformation.episode_duration":
+		if e.complexity.AiringInformation.EpisodeDuration == nil {
+			break
+		}
+
+		return e.complexity.AiringInformation.EpisodeDuration(childComplexity), true
+
+	case "AiringInformation.num_episodes":
+		if e.complexity.AiringInformation.NumEpisodes == nil {
+			break
+		}
+
+		return e.complexity.AiringInformation.NumEpisodes(childComplexity), true
+
+	case "AiringInformation.season":
+		if e.complexity.AiringInformation.Season == nil {
+			break
+		}
+
+		return e.complexity.AiringInformation.Season(childComplexity), true
+
+	case "AiringInformation.start_day":
+		if e.complexity.AiringInformation.StartDay == nil {
+			break
+		}
+
+		return e.complexity.AiringInformation.StartDay(childComplexity), true
+
+	case "AiringInformation.start_month":
+		if e.complexity.AiringInformation.StartMonth == nil {
+			break
+		}
+
+		return e.complexity.AiringInformation.StartMonth(childComplexity), true
+
+	case "AiringInformation.start_year":
+		if e.complexity.AiringInformation.StartYear == nil {
+			break
+		}
+
+		return e.complexity.AiringInformation.StartYear(childComplexity), true
+
+	case "AiringInformation.year":
+		if e.complexity.AiringInformation.Year == nil {
+			break
+		}
+
+		return e.complexity.AiringInformation.Year(childComplexity), true
+
+	case "Anime.airing_information":
+		if e.complexity.Anime.AiringInformation == nil {
+			break
+		}
+
+		return e.complexity.Anime.AiringInformation(childComplexity), true
 
 	case "Anime.id":
 		if e.complexity.Anime.ID == nil {
@@ -156,6 +242,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Anime.TitleJp(childComplexity), true
+
+	case "Query.airingInformation":
+		if e.complexity.Query.AiringInformation == nil {
+			break
+		}
+
+		args, err := ec.field_Query_airingInformation_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AiringInformation(childComplexity, args["id"].(string)), true
 
 	case "Query.anime":
 		if e.complexity.Query.Anime == nil {
@@ -290,6 +388,7 @@ var sources = []*ast.Source{
   studio: String!
   imageUrl: String!
   statistic: Statistic!
+  airing_information: AiringInformation!
 }
 
 type Statistic {
@@ -302,9 +401,23 @@ type Statistic {
   rating: Int!
 }
 
+type AiringInformation {
+  anime_id: ID!
+  start_day: Int!
+  start_month: Int!
+  start_year: Int!
+  year: Int!
+  season: String!
+  num_episodes: Int!
+  episode_duration: Int!
+  airing: Boolean!
+}
+
+
 type Query {
   anime(id: ID!): Anime
   statistic(id: ID!): Statistic
+  airingInformation(id: ID!): AiringInformation
 }
 `, BuiltIn: false},
 }
@@ -326,6 +439,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_airingInformation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -396,6 +524,321 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AiringInformation_anime_id(ctx context.Context, field graphql.CollectedField, obj *model.AiringInformation) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AiringInformation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AnimeID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AiringInformation_start_day(ctx context.Context, field graphql.CollectedField, obj *model.AiringInformation) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AiringInformation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartDay, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AiringInformation_start_month(ctx context.Context, field graphql.CollectedField, obj *model.AiringInformation) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AiringInformation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartMonth, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AiringInformation_start_year(ctx context.Context, field graphql.CollectedField, obj *model.AiringInformation) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AiringInformation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartYear, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AiringInformation_year(ctx context.Context, field graphql.CollectedField, obj *model.AiringInformation) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AiringInformation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Year, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AiringInformation_season(ctx context.Context, field graphql.CollectedField, obj *model.AiringInformation) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AiringInformation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Season, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AiringInformation_num_episodes(ctx context.Context, field graphql.CollectedField, obj *model.AiringInformation) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AiringInformation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NumEpisodes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AiringInformation_episode_duration(ctx context.Context, field graphql.CollectedField, obj *model.AiringInformation) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AiringInformation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EpisodeDuration, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AiringInformation_airing(ctx context.Context, field graphql.CollectedField, obj *model.AiringInformation) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AiringInformation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Airing, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Anime_id(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
 	defer func() {
@@ -712,6 +1155,41 @@ func (ec *executionContext) _Anime_statistic(ctx context.Context, field graphql.
 	return ec.marshalNStatistic2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatistic(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Anime_airing_information(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Anime",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Anime().AiringInformation(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AiringInformation)
+	fc.Result = res
+	return ec.marshalNAiringInformation2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformation(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_anime(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -788,6 +1266,45 @@ func (ec *executionContext) _Query_statistic(ctx context.Context, field graphql.
 	res := resTmp.(*model.Statistic)
 	fc.Result = res
 	return ec.marshalOStatistic2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatistic(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_airingInformation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_airingInformation_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AiringInformation(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AiringInformation)
+	fc.Result = res
+	return ec.marshalOAiringInformation2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformation(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2201,6 +2718,73 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** object.gotpl ****************************
 
+var airingInformationImplementors = []string{"AiringInformation"}
+
+func (ec *executionContext) _AiringInformation(ctx context.Context, sel ast.SelectionSet, obj *model.AiringInformation) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, airingInformationImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AiringInformation")
+		case "anime_id":
+			out.Values[i] = ec._AiringInformation_anime_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "start_day":
+			out.Values[i] = ec._AiringInformation_start_day(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "start_month":
+			out.Values[i] = ec._AiringInformation_start_month(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "start_year":
+			out.Values[i] = ec._AiringInformation_start_year(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "year":
+			out.Values[i] = ec._AiringInformation_year(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "season":
+			out.Values[i] = ec._AiringInformation_season(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "num_episodes":
+			out.Values[i] = ec._AiringInformation_num_episodes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "episode_duration":
+			out.Values[i] = ec._AiringInformation_episode_duration(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "airing":
+			out.Values[i] = ec._AiringInformation_airing(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var animeImplementors = []string{"Anime"}
 
 func (ec *executionContext) _Anime(ctx context.Context, sel ast.SelectionSet, obj *model.Anime) graphql.Marshaler {
@@ -2266,6 +2850,20 @@ func (ec *executionContext) _Anime(ctx context.Context, sel ast.SelectionSet, ob
 				}
 				return res
 			})
+		case "airing_information":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Anime_airing_information(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2312,6 +2910,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_statistic(ctx, field)
+				return res
+			})
+		case "airingInformation":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_airingInformation(ctx, field)
 				return res
 			})
 		case "__type":
@@ -2631,6 +3240,20 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAiringInformation2githubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformation(ctx context.Context, sel ast.SelectionSet, v model.AiringInformation) graphql.Marshaler {
+	return ec._AiringInformation(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAiringInformation2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformation(ctx context.Context, sel ast.SelectionSet, v *model.AiringInformation) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._AiringInformation(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2932,6 +3555,13 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalOAiringInformation2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformation(ctx context.Context, sel ast.SelectionSet, v *model.AiringInformation) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AiringInformation(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnime(ctx context.Context, sel ast.SelectionSet, v *model.Anime) graphql.Marshaler {

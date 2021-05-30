@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/airingInformation"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/anime"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/statistic"
 )
@@ -11,6 +12,7 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	AnimeController     anime.Anime
-	StatisticController statistic.Statistic
+	AnimeController             anime.Anime
+	StatisticController         statistic.Statistic
+	AiringInformationController airingInformation.AiringInformation
 }

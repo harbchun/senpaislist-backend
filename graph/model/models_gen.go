@@ -2,16 +2,29 @@
 
 package model
 
+type AiringInformation struct {
+	AnimeID         string `json:"anime_id"`
+	StartDay        int    `json:"start_day"`
+	StartMonth      int    `json:"start_month"`
+	StartYear       int    `json:"start_year"`
+	Year            int    `json:"year"`
+	Season          string `json:"season"`
+	NumEpisodes     int    `json:"num_episodes"`
+	EpisodeDuration int    `json:"episode_duration"`
+	Airing          bool   `json:"airing"`
+}
+
 type Anime struct {
-	ID        string     `json:"id"`
-	Tid       int        `json:"tid"`
-	Title     string     `json:"title"`
-	TitleJp   string     `json:"title_jp"`
-	Summary   string     `json:"summary"`
-	Source    string     `json:"source"`
-	Studio    string     `json:"studio"`
-	ImageURL  string     `json:"imageUrl"`
-	Statistic *Statistic `json:"statistic"`
+	ID                string             `json:"id"`
+	Tid               int                `json:"tid"`
+	Title             string             `json:"title"`
+	TitleJp           string             `json:"title_jp"`
+	Summary           string             `json:"summary"`
+	Source            string             `json:"source"`
+	Studio            string             `json:"studio"`
+	ImageURL          string             `json:"imageUrl"`
+	Statistic         *Statistic         `json:"statistic"`
+	AiringInformation *AiringInformation `json:"airing_information"`
 }
 
 type Statistic struct {

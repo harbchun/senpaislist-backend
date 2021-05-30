@@ -58,3 +58,5 @@ models:
     fields:
       statistic:
         resolver: true
+      airing_information:
+        resolver: true

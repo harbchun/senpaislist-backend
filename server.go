@@ -13,6 +13,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/harrisonwjs/senpaislist-backend/database"
 	"github.com/harrisonwjs/senpaislist-backend/graph"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/airingInformation"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/anime"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/statistic"
 	"github.com/harrisonwjs/senpaislist-backend/graph/generated"
@@ -42,8 +43,9 @@ func main() {
 	db := database.InitDB()
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
-		AnimeController:     anime.Anime{DB: db},
-		StatisticController: statistic.Statistic{DB: db},
+		AnimeController:             anime.Anime{DB: db},
+		StatisticController:         statistic.Statistic{DB: db},
+		AiringInformationController: airingInformation.AiringInformation{DB: db},
 	}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))

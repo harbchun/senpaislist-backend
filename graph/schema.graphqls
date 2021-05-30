@@ -8,6 +8,7 @@ type Anime {
   studio: String!
   imageUrl: String!
   statistic: Statistic!
+  airing_information: AiringInformation!
 }
 
 type Statistic {
@@ -20,7 +21,21 @@ type Statistic {
   rating: Int!
 }
 
+type AiringInformation {
+  anime_id: ID!
+  start_day: Int!
+  start_month: Int!
+  start_year: Int!
+  year: Int!
+  season: String!
+  num_episodes: Int!
+  episode_duration: Int!
+  airing: Boolean!
+}
+
+
 type Query {
   anime(id: ID!): Anime
   statistic(id: ID!): Statistic
+  airingInformation(id: ID!): AiringInformation
 }
