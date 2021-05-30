@@ -1,14 +1,14 @@
 type Anime {
   id: ID!
+  tid: Int!
   title: String!
-  titleJp: String!
-  description: String!
-  genres: String!
-  year: Int!
+  title_jp: String!
+  summary: String!
+  source: String!
+  studio: String!
   imageUrl: String!
 }
 
 type Query {
   anime(id: ID!): Anime
-  animes(limit: Int): [Anime]
 }
