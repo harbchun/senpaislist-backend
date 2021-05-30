@@ -60,3 +60,9 @@ models:
         resolver: true
       airing_information:
         resolver: true
+      anime_genres:
+        resolver: true
+  Genre:
+    fields:
+      animes_genre:
+        resolver: true
