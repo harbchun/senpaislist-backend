@@ -20,6 +20,7 @@ import (
 const defaultPort = "5001"
 
 func main() {
+	log.Printf("Starting up...")
 	m, err := migrate.New(
 		"file://migrations",
 		"postgres://postgres:championsclub123@postgres:5432/postgres?sslmode=disable")
@@ -27,7 +28,9 @@ func main() {
 		log.Fatal(err)
 	}
 	if err := m.Up(); err != nil {
-		log.Fatal(err)
+		log.Printf("Migrations failed...")
+	} else {
+		log.Printf("Migrations passed...")
 	}
 
 	port := os.Getenv("PORT")
