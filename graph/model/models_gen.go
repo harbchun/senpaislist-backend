@@ -25,6 +25,23 @@ type Anime struct {
 	ImageURL          string             `json:"imageUrl"`
 	Statistic         *Statistic         `json:"statistic"`
 	AiringInformation *AiringInformation `json:"airing_information"`
+	AnimeGenres       []*AnimesGenres    `json:"anime_genres"`
+}
+
+type AnimesGenres struct {
+	AnimeID string `json:"anime_id"`
+	Genre   string `json:"genre"`
+}
+
+type Genre struct {
+	ID          string          `json:"id"`
+	Genre       string          `json:"genre"`
+	AnimesGenre []*AnimesGenres `json:"animes_genre"`
+}
+
+type Season struct {
+	ID     string `json:"id"`
+	Season string `json:"season"`
 }
 
 type Statistic struct {
@@ -35,4 +52,9 @@ type Statistic struct {
 	Popularity int    `json:"popularity"`
 	Favorites  int    `json:"favorites"`
 	Rating     int    `json:"rating"`
+}
+
+type Year struct {
+	ID   string `json:"id"`
+	Year int    `json:"year"`
 }
