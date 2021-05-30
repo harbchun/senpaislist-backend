@@ -5,28 +5,15 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/harrisonwjs/senpaislist-backend/graph/generated"
 	"github.com/harrisonwjs/senpaislist-backend/graph/model"
 )
 
 func (r *queryResolver) Anime(ctx context.Context, id string) (*model.Anime, error) {
-	mockAnime := &model.Anime{
-		ID:          "4",
-		Title:       "Jujutsu Kaisen",
-		TitleJp:     "jujutsu kaisen",
-		Description: "curse bad",
-		Genres:      "action",
-		Year:        2020,
-		ImageURL:    "google.com",
-	}
+	anime := r.AnimeController.GetAnime(id)
 
-	return mockAnime, nil
-}
-
-func (r *queryResolver) Animes(ctx context.Context, limit *int) ([]*model.Anime, error) {
-	panic(fmt.Errorf("not implemented"))
+	return &anime, nil
 }
 
 // Query returns generated.QueryResolver implementation.
