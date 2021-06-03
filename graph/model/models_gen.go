@@ -22,15 +22,26 @@ type Anime struct {
 	Summary           string             `json:"summary"`
 	Source            string             `json:"source"`
 	Studio            string             `json:"studio"`
-	ImageURL          string             `json:"imageUrl"`
+	ImageURL          string             `json:"image_url"`
 	Statistic         *Statistic         `json:"statistic"`
 	AiringInformation *AiringInformation `json:"airing_information"`
 	AnimeGenres       []*AnimesGenres    `json:"anime_genres"`
 }
 
+type AnimeFilterInput struct {
+	AnimeGenres []*AnimesGenresFilterInput `json:"anime_genres"`
+	And         []*AnimeFilterInput        `json:"_and"`
+	Or          []*AnimeFilterInput        `json:"_or"`
+}
+
 type AnimesGenres struct {
 	AnimeID string `json:"anime_id"`
 	Genre   string `json:"genre"`
+}
+
+type AnimesGenresFilterInput struct {
+	AnimeID *string `json:"anime_id"`
+	Genre   *string `json:"genre"`
 }
 
 type Genre struct {

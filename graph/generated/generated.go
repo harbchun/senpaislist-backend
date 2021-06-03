@@ -85,7 +85,7 @@ type ComplexityRoot struct {
 		AiringInformation func(childComplexity int, id string) int
 		Anime             func(childComplexity int, id string) int
 		AnimeGenres       func(childComplexity int, id string) int
-		Animes            func(childComplexity int, id *string, title *string) int
+		Animes            func(childComplexity int, filter *model.AnimeFilterInput) int
 		AnimesGenre       func(childComplexity int, genre string) int
 		Genres            func(childComplexity int) int
 		Seasons           func(childComplexity int) int
@@ -124,7 +124,7 @@ type GenreResolver interface {
 }
 type QueryResolver interface {
 	Anime(ctx context.Context, id string) (*model.Anime, error)
-	Animes(ctx context.Context, id *string, title *string) ([]*model.Anime, error)
+	Animes(ctx context.Context, filter *model.AnimeFilterInput) ([]*model.Anime, error)
 	Statistic(ctx context.Context, id string) (*model.Statistic, error)
 	AiringInformation(ctx context.Context, id string) (*model.AiringInformation, error)
 	Years(ctx context.Context) ([]*model.Year, error)
@@ -233,7 +233,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Anime.ID(childComplexity), true
 
-	case "Anime.imageUrl":
+	case "Anime.image_url":
 		if e.complexity.Anime.ImageURL == nil {
 			break
 		}
@@ -370,7 +370,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Animes(childComplexity, args["id"].(*string), args["title"].(*string)), true
+		return e.complexity.Query.Animes(childComplexity, args["filter"].(*model.AnimeFilterInput)), true
 
 	case "Query.animes_genre":
 		if e.complexity.Query.AnimesGenre == nil {
@@ -552,10 +552,22 @@ var sources = []*ast.Source{
   summary: String!
   source: String!
   studio: String!
-  imageUrl: String!
+  image_url: String!
   statistic: Statistic!
   airing_information: AiringInformation!
   anime_genres: [AnimesGenres!]!
+}
+
+input AnimeFilterInput {
+  anime_genres: [AnimesGenresFilterInput!]
+
+  _and: [AnimeFilterInput!]
+  _or: [AnimeFilterInput!]
+}
+
+input AnimesGenresFilterInput {
+  anime_id: ID
+  genre: String
 }
 
 type Statistic {
@@ -603,7 +615,7 @@ type AnimesGenres {
 
 type Query {
   anime(id: ID!): Anime
-  animes(id: ID, title: String): [Anime!]!
+  animes(filter: AnimeFilterInput): [Anime!]!
   statistic(id: ID!): Statistic
   airingInformation(id: ID!): AiringInformation
   years: [Year!]!
@@ -683,24 +695,15 @@ func (ec *executionContext) field_Query_anime_genres_args(ctx context.Context, r
 func (ec *executionContext) field_Query_animes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+	var arg0 *model.AnimeFilterInput
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOAnimeFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["title"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["title"] = arg1
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -1332,7 +1335,7 @@ func (ec *executionContext) _Anime_studio(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Anime_imageUrl(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
+func (ec *executionContext) _Anime_image_url(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1711,7 +1714,7 @@ func (ec *executionContext) _Query_animes(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Animes(rctx, args["id"].(*string), args["title"].(*string))
+		return ec.resolvers.Query().Animes(rctx, args["filter"].(*model.AnimeFilterInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3538,6 +3541,70 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAnimeFilterInput(ctx context.Context, obj interface{}) (model.AnimeFilterInput, error) {
+	var it model.AnimeFilterInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "anime_genres":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("anime_genres"))
+			it.AnimeGenres, err = ec.unmarshalOAnimesGenresFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimesGenresFilterInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_and"))
+			it.And, err = ec.unmarshalOAnimeFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_or"))
+			it.Or, err = ec.unmarshalOAnimeFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAnimesGenresFilterInput(ctx context.Context, obj interface{}) (model.AnimesGenresFilterInput, error) {
+	var it model.AnimesGenresFilterInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "anime_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("anime_id"))
+			it.AnimeID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "genre":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("genre"))
+			it.Genre, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3659,8 +3726,8 @@ func (ec *executionContext) _Anime(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "imageUrl":
-			out.Values[i] = ec._Anime_imageUrl(ctx, field, obj)
+		case "image_url":
+			out.Values[i] = ec._Anime_image_url(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -4369,6 +4436,11 @@ func (ec *executionContext) marshalNAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpai
 	return ec._Anime(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNAnimeFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInput(ctx context.Context, v interface{}) (*model.AnimeFilterInput, error) {
+	res, err := ec.unmarshalInputAnimeFilterInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNAnimesGenres2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimesGenresᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AnimesGenres) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -4414,6 +4486,11 @@ func (ec *executionContext) marshalNAnimesGenres2ᚖgithubᚗcomᚋharrisonwjs�
 		return graphql.Null
 	}
 	return ec._AnimesGenres(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNAnimesGenresFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimesGenresFilterInput(ctx context.Context, v interface{}) (*model.AnimesGenresFilterInput, error) {
+	res, err := ec.unmarshalInputAnimesGenresFilterInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
@@ -4872,6 +4949,62 @@ func (ec *executionContext) marshalOAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpai
 		return graphql.Null
 	}
 	return ec._Anime(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOAnimeFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInputᚄ(ctx context.Context, v interface{}) ([]*model.AnimeFilterInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AnimeFilterInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAnimeFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOAnimeFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInput(ctx context.Context, v interface{}) (*model.AnimeFilterInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputAnimeFilterInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOAnimesGenresFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimesGenresFilterInputᚄ(ctx context.Context, v interface{}) ([]*model.AnimesGenresFilterInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AnimesGenresFilterInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAnimesGenresFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimesGenresFilterInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
