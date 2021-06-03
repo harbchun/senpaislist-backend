@@ -6,10 +6,22 @@ type Anime {
   summary: String!
   source: String!
   studio: String!
-  imageUrl: String!
+  image_url: String!
   statistic: Statistic!
   airing_information: AiringInformation!
   anime_genres: [AnimesGenres!]!
+}
+
+input AnimeFilterInput {
+  anime_genres: [AnimesGenresFilterInput!]
+
+  _and: [AnimeFilterInput!]
+  _or: [AnimeFilterInput!]
+}
+
+input AnimesGenresFilterInput {
+  anime_id: ID
+  genre: String
 }
 
 type Statistic {
@@ -57,7 +69,7 @@ type AnimesGenres {
 
 type Query {
   anime(id: ID!): Anime
-  animes(id: ID, title: String): [Anime!]!
+  animes(filter: AnimeFilterInput): [Anime!]!
   statistic(id: ID!): Statistic
   airingInformation(id: ID!): AiringInformation
   years: [Year!]!

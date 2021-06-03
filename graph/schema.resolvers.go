@@ -40,8 +40,8 @@ func (r *queryResolver) Anime(ctx context.Context, id string) (*model.Anime, err
 	return &anime, nil
 }
 
-func (r *queryResolver) Animes(ctx context.Context, id *string, title *string) ([]*model.Anime, error) {
-	animes := r.AnimeController.GetAnimes(id, title)
+func (r *queryResolver) Animes(ctx context.Context, filter *model.AnimeFilterInput) ([]*model.Anime, error) {
+	animes := r.AnimeController.GetAnimes(filter)
 
 	return animes, nil
 }
