@@ -2,12 +2,59 @@
 
 package model
 
+type AiringInformation struct {
+	AnimeID         string `json:"anime_id"`
+	StartDay        int    `json:"start_day"`
+	StartMonth      int    `json:"start_month"`
+	StartYear       int    `json:"start_year"`
+	Year            int    `json:"year"`
+	Season          string `json:"season"`
+	NumEpisodes     int    `json:"num_episodes"`
+	EpisodeDuration int    `json:"episode_duration"`
+	Airing          bool   `json:"airing"`
+}
+
 type Anime struct {
-	ID          string `json:"id"`
-	Title       string `json:"title"`
-	TitleJp     string `json:"titleJp"`
-	Description string `json:"description"`
-	Genres      string `json:"genres"`
-	Year        int    `json:"year"`
-	ImageURL    string `json:"imageUrl"`
+	ID                string             `json:"id"`
+	Tid               int                `json:"tid"`
+	Title             string             `json:"title"`
+	TitleJp           string             `json:"title_jp"`
+	Summary           string             `json:"summary"`
+	Source            string             `json:"source"`
+	Studio            string             `json:"studio"`
+	ImageURL          string             `json:"imageUrl"`
+	Statistic         *Statistic         `json:"statistic"`
+	AiringInformation *AiringInformation `json:"airing_information"`
+	AnimeGenres       []*AnimesGenres    `json:"anime_genres"`
+}
+
+type AnimesGenres struct {
+	AnimeID string `json:"anime_id"`
+	Genre   string `json:"genre"`
+}
+
+type Genre struct {
+	ID          string          `json:"id"`
+	Genre       string          `json:"genre"`
+	AnimesGenre []*AnimesGenres `json:"animes_genre"`
+}
+
+type Season struct {
+	ID     string `json:"id"`
+	Season string `json:"season"`
+}
+
+type Statistic struct {
+	AnimeID    string `json:"anime_id"`
+	Score      int    `json:"score"`
+	ScoredBy   int    `json:"scored_by"`
+	Rank       int    `json:"rank"`
+	Popularity int    `json:"popularity"`
+	Favorites  int    `json:"favorites"`
+	Rating     int    `json:"rating"`
+}
+
+type Year struct {
+	ID   string `json:"id"`
+	Year int    `json:"year"`
 }

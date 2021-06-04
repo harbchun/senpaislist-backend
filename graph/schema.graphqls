@@ -1,14 +1,68 @@
 type Anime {
   id: ID!
+  tid: Int!
   title: String!
-  titleJp: String!
-  description: String!
-  genres: String!
-  year: Int!
+  title_jp: String!
+  summary: String!
+  source: String!
+  studio: String!
   imageUrl: String!
+  statistic: Statistic!
+  airing_information: AiringInformation!
+  anime_genres: [AnimesGenres!]!
+}
+
+type Statistic {
+  anime_id: ID!
+  score: Int!
+  scored_by: Int!
+  rank: Int!
+  popularity: Int!
+  favorites: Int!
+  rating: Int!
+}
+
+type AiringInformation {
+  anime_id: ID!
+  start_day: Int!
+  start_month: Int!
+  start_year: Int!
+  year: Int!
+  season: String!
+  num_episodes: Int!
+  episode_duration: Int!
+  airing: Boolean!
+}
+
+type Genre {
+  id: ID!
+  genre: String!
+  animes_genre: [AnimesGenres!]!
+}
+
+type Year {
+  id: ID!
+  year: Int!
+}
+
+type Season {
+  id: ID!
+  season: String!
+}
+
+type AnimesGenres {
+  anime_id: ID!
+  genre: String!
 }
 
 type Query {
   anime(id: ID!): Anime
-  animes(limit: Int): [Anime]
+  animes(id: ID, title: String): [Anime!]!
+  statistic(id: ID!): Statistic
+  airingInformation(id: ID!): AiringInformation
+  years: [Year!]!
+  genres: [Genre!]!
+  seasons: [Season!]!
+  anime_genres(id: ID!): [AnimesGenres!]!
+  animes_genre(genre: String!): [AnimesGenres!]!
 }

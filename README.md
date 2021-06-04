@@ -2,8 +2,11 @@ Workflow:
 
 ---
  - Make changes
- - Generate code command
+ - Generate code command: go run github.com/99designs/gqlgen generate
  - Server live reloads with new gen data
+ 
+ gqlgen is buggy so when the mod is tidied some packages are removed and generate breaks.
+ To circumvent this: go get github.com/99designs/gqlgen
 ---
 
 When downloading packages: 

@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS airing_informations(
    anime_id uuid NOT NULL,
-   start_day bigint NOT NULL,
-   start_month bigint NOT NULL,
-   start_year bigint NOT NULL,
+   start_day bigint,
+   start_month bigint,
+   start_year bigint,
    year INT NOT NULL,
    season VARCHAR NOT NULL,
    num_episodes INT,

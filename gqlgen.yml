@@ -54,3 +54,15 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  Anime:
+    fields:
+      statistic:
+        resolver: true
+      airing_information:
+        resolver: true
+      anime_genres:
+        resolver: true
+  Genre:
+    fields:
+      animes_genre:
+        resolver: true

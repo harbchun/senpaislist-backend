@@ -11,13 +11,22 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/harrisonwjs/senpaislist-backend/database"
 	"github.com/harrisonwjs/senpaislist-backend/graph"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/airingInformation"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/anime"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/animesgenres"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/genre"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/season"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/statistic"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/year"
 	"github.com/harrisonwjs/senpaislist-backend/graph/generated"
 )
 
 const defaultPort = "5001"
 
 func main() {
+	log.Printf("Starting up...")
 	m, err := migrate.New(
 		"file://migrations",
 		"postgres://postgres:championsclub123@postgres:5432/postgres?sslmode=disable")
@@ -25,7 +34,9 @@ func main() {
 		log.Fatal(err)
 	}
 	if err := m.Up(); err != nil {
-		log.Fatal(err)
+		log.Printf("Migrations failed...")
+	} else {
+		log.Printf("Migrations passed...")
 	}
 
 	port := os.Getenv("PORT")
@@ -33,7 +44,17 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	db := database.InitDB()
+
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
+		AnimeController:             anime.Anime{DB: db},
+		StatisticController:         statistic.Statistic{DB: db},
+		AiringInformationController: airingInformation.AiringInformation{DB: db},
+		GenreController:             genre.Genre{DB: db},
+		YearController:              year.Year{DB: db},
+		SeasonController:            season.Season{DB: db},
+		AnimesGenresController:      animesgenres.AnimesGenres{DB: db},
+	}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
