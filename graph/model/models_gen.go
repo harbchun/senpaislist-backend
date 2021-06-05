@@ -14,6 +14,16 @@ type AiringInformation struct {
 	Airing          bool   `json:"airing"`
 }
 
+type AiringInformationsFilterInput struct {
+	Year   *OperatorsIntInput    `json:"year"`
+	Season *OperatorsStringInput `json:"season"`
+}
+
+type AiringInformationsSortInput struct {
+	Year   *string `json:"year"`
+	Season *string `json:"season"`
+}
+
 type Anime struct {
 	ID                string             `json:"id"`
 	Tid               int                `json:"tid"`
@@ -29,9 +39,27 @@ type Anime struct {
 }
 
 type AnimeFilterInput struct {
-	AnimeGenres []*AnimesGenresFilterInput `json:"anime_genres"`
-	And         []*AnimeFilterInput        `json:"_and"`
-	Or          []*AnimeFilterInput        `json:"_or"`
+	ID                 *OperatorsIDInput                `json:"id"`
+	Title              *OperatorsStringInput            `json:"title"`
+	TitleJp            *OperatorsStringInput            `json:"title_jp"`
+	Tid                *OperatorsIDInput                `json:"tid"`
+	Studio             *OperatorsStringInput            `json:"studio"`
+	AnimeGenres        []*AnimesGenresFilterInput       `json:"anime_genres"`
+	AiringInformations []*AiringInformationsFilterInput `json:"airing_informations"`
+	And                []*AnimeFilterInput              `json:"_and"`
+	Or                 []*AnimeFilterInput              `json:"_or"`
+}
+
+type AnimeGenresSortInput struct {
+	Genre *string `json:"genre"`
+}
+
+type AnimeSortInput struct {
+	Title              *string                        `json:"title"`
+	TitleJp            *string                        `json:"title_jp"`
+	AnimeGenres        []*AnimeGenresSortInput        `json:"anime_genres"`
+	Statistics         []*StatisticsSortInput         `json:"statistics"`
+	AiringInformations []*AiringInformationsSortInput `json:"airing_informations"`
 }
 
 type AnimesGenres struct {
@@ -40,8 +68,8 @@ type AnimesGenres struct {
 }
 
 type AnimesGenresFilterInput struct {
-	AnimeID *string `json:"anime_id"`
-	Genre   *string `json:"genre"`
+	AnimeID *OperatorsIDInput     `json:"anime_id"`
+	Genre   *OperatorsStringInput `json:"genre"`
 }
 
 type Genre struct {
@@ -65,7 +93,40 @@ type Statistic struct {
 	Rating     int    `json:"rating"`
 }
 
+type StatisticsSortInput struct {
+	Popularity *string `json:"popularity"`
+	Score      *string `json:"score"`
+	Rank       *string `json:"rank"`
+	Rating     *string `json:"rating"`
+	Favorites  *string `json:"favorites"`
+}
+
 type Year struct {
 	ID   string `json:"id"`
 	Year int    `json:"year"`
+}
+
+type OperatorsIDInput struct {
+	Eq  *string  `json:"_eq"`
+	Neq *string  `json:"_neq"`
+	In  []string `json:"_in"`
+	Nin []string `json:"_nin"`
+}
+
+type OperatorsIntInput struct {
+	Eq  *int  `json:"_eq"`
+	Neq *int  `json:"_neq"`
+	Gt  *int  `json:"_gt"`
+	Gte *int  `json:"_gte"`
+	Lt  *int  `json:"_lt"`
+	Lte *int  `json:"_lte"`
+	In  []int `json:"_in"`
+	Nin []int `json:"_nin"`
+}
+
+type OperatorsStringInput struct {
+	Eq  *string  `json:"_eq"`
+	Neq *string  `json:"_neq"`
+	In  []string `json:"_in"`
+	Nin []string `json:"_nin"`
 }
