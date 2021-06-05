@@ -85,7 +85,7 @@ type ComplexityRoot struct {
 		AiringInformation func(childComplexity int, id string) int
 		Anime             func(childComplexity int, id string) int
 		AnimeGenres       func(childComplexity int, id string) int
-		Animes            func(childComplexity int, id *string, title *string) int
+		Animes            func(childComplexity int, filter *model.AnimeFilterInput, orderBy *model.AnimeSortInput) int
 		AnimesGenre       func(childComplexity int, genre string) int
 		Genres            func(childComplexity int) int
 		Seasons           func(childComplexity int) int
@@ -124,7 +124,7 @@ type GenreResolver interface {
 }
 type QueryResolver interface {
 	Anime(ctx context.Context, id string) (*model.Anime, error)
-	Animes(ctx context.Context, id *string, title *string) ([]*model.Anime, error)
+	Animes(ctx context.Context, filter *model.AnimeFilterInput, orderBy *model.AnimeSortInput) ([]*model.Anime, error)
 	Statistic(ctx context.Context, id string) (*model.Statistic, error)
 	AiringInformation(ctx context.Context, id string) (*model.AiringInformation, error)
 	Years(ctx context.Context) ([]*model.Year, error)
@@ -233,7 +233,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Anime.ID(childComplexity), true
 
-	case "Anime.imageUrl":
+	case "Anime.image_url":
 		if e.complexity.Anime.ImageURL == nil {
 			break
 		}
@@ -370,7 +370,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Animes(childComplexity, args["id"].(*string), args["title"].(*string)), true
+		return e.complexity.Query.Animes(childComplexity, args["filter"].(*model.AnimeFilterInput), args["order_by"].(*model.AnimeSortInput)), true
 
 	case "Query.animes_genre":
 		if e.complexity.Query.AnimesGenre == nil {
@@ -552,10 +552,62 @@ var sources = []*ast.Source{
   summary: String!
   source: String!
   studio: String!
-  imageUrl: String!
+  image_url: String!
   statistic: Statistic!
   airing_information: AiringInformation!
   anime_genres: [AnimesGenres!]!
+}
+
+input AnimeFilterInput {
+  id: operatorsIdInput
+  title: operatorsStringInput
+  title_jp: operatorsStringInput
+  tid: operatorsIdInput
+  studio: operatorsStringInput
+
+  anime_genres: [AnimesGenresFilterInput!]
+
+  airing_informations: [AiringInformationsFilterInput]
+
+  _and: [AnimeFilterInput!]
+  _or: [AnimeFilterInput!]
+}
+
+input AnimesGenresFilterInput {
+  anime_id: operatorsIdInput
+  genre: operatorsStringInput
+}
+
+input AiringInformationsFilterInput {
+  year: operatorsIntInput
+  season: operatorsStringInput
+}
+
+input AnimeSortInput {
+  title: String
+  title_jp: String
+  
+  anime_genres: [AnimeGenresSortInput!]
+  statistics: [StatisticsSortInput!]
+  airing_informations: [AiringInformationsSortInput!]
+
+}
+
+input AnimeGenresSortInput {
+  genre: String
+}
+
+input AiringInformationsSortInput {
+  year: String
+  season: String
+}
+
+input StatisticsSortInput {
+  popularity: String
+  score: String
+  rank: String
+  rating: String
+  favorites: String
 }
 
 type Statistic {
@@ -601,9 +653,34 @@ type AnimesGenres {
   genre: String!
 }
 
+input operatorsStringInput {
+  _eq: String
+  _neq: String
+  _in: [String!]
+  _nin: [String!]
+}
+
+input operatorsIntInput {
+  _eq: Int
+  _neq: Int
+  _gt: Int
+  _gte: Int
+  _lt: Int
+  _lte: Int
+  _in: [Int!]
+  _nin: [Int!]
+}
+
+input operatorsIdInput {
+  _eq: ID
+  _neq: ID
+  _in: [ID!]
+  _nin: [ID!]
+}
+
 type Query {
   anime(id: ID!): Anime
-  animes(id: ID, title: String): [Anime!]!
+  animes(filter: AnimeFilterInput, order_by: AnimeSortInput): [Anime!]!
   statistic(id: ID!): Statistic
   airingInformation(id: ID!): AiringInformation
   years: [Year!]!
@@ -683,24 +760,24 @@ func (ec *executionContext) field_Query_anime_genres_args(ctx context.Context, r
 func (ec *executionContext) field_Query_animes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+	var arg0 *model.AnimeFilterInput
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalOAnimeFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["title"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+	args["filter"] = arg0
+	var arg1 *model.AnimeSortInput
+	if tmp, ok := rawArgs["order_by"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("order_by"))
+		arg1, err = ec.unmarshalOAnimeSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeSortInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["title"] = arg1
+	args["order_by"] = arg1
 	return args, nil
 }
 
@@ -1332,7 +1409,7 @@ func (ec *executionContext) _Anime_studio(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Anime_imageUrl(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
+func (ec *executionContext) _Anime_image_url(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1711,7 +1788,7 @@ func (ec *executionContext) _Query_animes(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Animes(rctx, args["id"].(*string), args["title"].(*string))
+		return ec.resolvers.Query().Animes(rctx, args["filter"].(*model.AnimeFilterInput), args["order_by"].(*model.AnimeSortInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3538,6 +3615,462 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAiringInformationsFilterInput(ctx context.Context, obj interface{}) (model.AiringInformationsFilterInput, error) {
+	var it model.AiringInformationsFilterInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "year":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("year"))
+			it.Year, err = ec.unmarshalOoperatorsIntInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐOperatorsIntInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "season":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("season"))
+			it.Season, err = ec.unmarshalOoperatorsStringInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐOperatorsStringInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAiringInformationsSortInput(ctx context.Context, obj interface{}) (model.AiringInformationsSortInput, error) {
+	var it model.AiringInformationsSortInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "year":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("year"))
+			it.Year, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "season":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("season"))
+			it.Season, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAnimeFilterInput(ctx context.Context, obj interface{}) (model.AnimeFilterInput, error) {
+	var it model.AnimeFilterInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOoperatorsIdInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐOperatorsIDInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalOoperatorsStringInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐOperatorsStringInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title_jp":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title_jp"))
+			it.TitleJp, err = ec.unmarshalOoperatorsStringInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐOperatorsStringInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "tid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tid"))
+			it.Tid, err = ec.unmarshalOoperatorsIdInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐOperatorsIDInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "studio":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("studio"))
+			it.Studio, err = ec.unmarshalOoperatorsStringInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐOperatorsStringInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "anime_genres":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("anime_genres"))
+			it.AnimeGenres, err = ec.unmarshalOAnimesGenresFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimesGenresFilterInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "airing_informations":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("airing_informations"))
+			it.AiringInformations, err = ec.unmarshalOAiringInformationsFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsFilterInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_and"))
+			it.And, err = ec.unmarshalOAnimeFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_or"))
+			it.Or, err = ec.unmarshalOAnimeFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAnimeGenresSortInput(ctx context.Context, obj interface{}) (model.AnimeGenresSortInput, error) {
+	var it model.AnimeGenresSortInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "genre":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("genre"))
+			it.Genre, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAnimeSortInput(ctx context.Context, obj interface{}) (model.AnimeSortInput, error) {
+	var it model.AnimeSortInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title_jp":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title_jp"))
+			it.TitleJp, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "anime_genres":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("anime_genres"))
+			it.AnimeGenres, err = ec.unmarshalOAnimeGenresSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeGenresSortInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "statistics":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statistics"))
+			it.Statistics, err = ec.unmarshalOStatisticsSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatisticsSortInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "airing_informations":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("airing_informations"))
+			it.AiringInformations, err = ec.unmarshalOAiringInformationsSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsSortInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAnimesGenresFilterInput(ctx context.Context, obj interface{}) (model.AnimesGenresFilterInput, error) {
+	var it model.AnimesGenresFilterInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "anime_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("anime_id"))
+			it.AnimeID, err = ec.unmarshalOoperatorsIdInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐOperatorsIDInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "genre":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("genre"))
+			it.Genre, err = ec.unmarshalOoperatorsStringInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐOperatorsStringInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputStatisticsSortInput(ctx context.Context, obj interface{}) (model.StatisticsSortInput, error) {
+	var it model.StatisticsSortInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "popularity":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("popularity"))
+			it.Popularity, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "score":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("score"))
+			it.Score, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "rank":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rank"))
+			it.Rank, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "rating":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rating"))
+			it.Rating, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "favorites":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("favorites"))
+			it.Favorites, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputoperatorsIdInput(ctx context.Context, obj interface{}) (model.OperatorsIDInput, error) {
+	var it model.OperatorsIDInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "_eq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_eq"))
+			it.Eq, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_neq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_neq"))
+			it.Neq, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_in":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_in"))
+			it.In, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_nin":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_nin"))
+			it.Nin, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputoperatorsIntInput(ctx context.Context, obj interface{}) (model.OperatorsIntInput, error) {
+	var it model.OperatorsIntInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "_eq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_eq"))
+			it.Eq, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_neq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_neq"))
+			it.Neq, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_gt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_gt"))
+			it.Gt, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_gte":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_gte"))
+			it.Gte, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_lt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_lt"))
+			it.Lt, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_lte":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_lte"))
+			it.Lte, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_in":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_in"))
+			it.In, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_nin":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_nin"))
+			it.Nin, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputoperatorsStringInput(ctx context.Context, obj interface{}) (model.OperatorsStringInput, error) {
+	var it model.OperatorsStringInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "_eq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_eq"))
+			it.Eq, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_neq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_neq"))
+			it.Neq, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_in":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_in"))
+			it.In, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "_nin":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("_nin"))
+			it.Nin, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3659,8 +4192,8 @@ func (ec *executionContext) _Anime(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "imageUrl":
-			out.Values[i] = ec._Anime_imageUrl(ctx, field, obj)
+		case "image_url":
+			out.Values[i] = ec._Anime_image_url(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -4322,6 +4855,11 @@ func (ec *executionContext) marshalNAiringInformation2ᚖgithubᚗcomᚋharrison
 	return ec._AiringInformation(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNAiringInformationsSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsSortInput(ctx context.Context, v interface{}) (*model.AiringInformationsSortInput, error) {
+	res, err := ec.unmarshalInputAiringInformationsSortInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNAnime2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Anime) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -4369,6 +4907,16 @@ func (ec *executionContext) marshalNAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpai
 	return ec._Anime(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNAnimeFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInput(ctx context.Context, v interface{}) (*model.AnimeFilterInput, error) {
+	res, err := ec.unmarshalInputAnimeFilterInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNAnimeGenresSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeGenresSortInput(ctx context.Context, v interface{}) (*model.AnimeGenresSortInput, error) {
+	res, err := ec.unmarshalInputAnimeGenresSortInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNAnimesGenres2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimesGenresᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AnimesGenres) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -4414,6 +4962,11 @@ func (ec *executionContext) marshalNAnimesGenres2ᚖgithubᚗcomᚋharrisonwjs�
 		return graphql.Null
 	}
 	return ec._AnimesGenres(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNAnimesGenresFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimesGenresFilterInput(ctx context.Context, v interface{}) (*model.AnimesGenresFilterInput, error) {
+	res, err := ec.unmarshalInputAnimesGenresFilterInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
@@ -4567,6 +5120,11 @@ func (ec *executionContext) marshalNStatistic2ᚖgithubᚗcomᚋharrisonwjsᚋse
 		return graphql.Null
 	}
 	return ec._Statistic(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNStatisticsSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatisticsSortInput(ctx context.Context, v interface{}) (*model.StatisticsSortInput, error) {
+	res, err := ec.unmarshalInputStatisticsSortInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -4867,11 +5425,155 @@ func (ec *executionContext) marshalOAiringInformation2ᚖgithubᚗcomᚋharrison
 	return ec._AiringInformation(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOAiringInformationsFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsFilterInput(ctx context.Context, v interface{}) ([]*model.AiringInformationsFilterInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AiringInformationsFilterInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOAiringInformationsFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsFilterInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOAiringInformationsFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsFilterInput(ctx context.Context, v interface{}) (*model.AiringInformationsFilterInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputAiringInformationsFilterInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOAiringInformationsSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsSortInputᚄ(ctx context.Context, v interface{}) ([]*model.AiringInformationsSortInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AiringInformationsSortInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAiringInformationsSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsSortInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
 func (ec *executionContext) marshalOAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnime(ctx context.Context, sel ast.SelectionSet, v *model.Anime) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Anime(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOAnimeFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInputᚄ(ctx context.Context, v interface{}) ([]*model.AnimeFilterInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AnimeFilterInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAnimeFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOAnimeFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInput(ctx context.Context, v interface{}) (*model.AnimeFilterInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputAnimeFilterInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOAnimeGenresSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeGenresSortInputᚄ(ctx context.Context, v interface{}) ([]*model.AnimeGenresSortInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AnimeGenresSortInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAnimeGenresSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeGenresSortInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOAnimeSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeSortInput(ctx context.Context, v interface{}) (*model.AnimeSortInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputAnimeSortInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOAnimesGenresFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimesGenresFilterInputᚄ(ctx context.Context, v interface{}) ([]*model.AnimesGenresFilterInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.AnimesGenresFilterInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAnimesGenresFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimesGenresFilterInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
@@ -4898,6 +5600,42 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
+func (ec *executionContext) unmarshalOID2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNID2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOID2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNID2string(ctx, sel, v[i])
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -4913,11 +5651,86 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	return graphql.MarshalID(*v)
 }
 
+func (ec *executionContext) unmarshalOInt2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]int, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNInt2int(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOInt2ᚕintᚄ(ctx context.Context, sel ast.SelectionSet, v []int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNInt2int(ctx, sel, v[i])
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalInt(*v)
+}
+
 func (ec *executionContext) marshalOStatistic2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatistic(ctx context.Context, sel ast.SelectionSet, v *model.Statistic) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Statistic(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOStatisticsSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatisticsSortInputᚄ(ctx context.Context, v interface{}) ([]*model.StatisticsSortInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.StatisticsSortInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNStatisticsSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatisticsSortInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
@@ -4927,6 +5740,42 @@ func (ec *executionContext) unmarshalOString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	return graphql.MarshalString(v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
@@ -5116,6 +5965,30 @@ func (ec *executionContext) marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 		return graphql.Null
 	}
 	return ec.___Type(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOoperatorsIdInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐOperatorsIDInput(ctx context.Context, v interface{}) (*model.OperatorsIDInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputoperatorsIdInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOoperatorsIntInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐOperatorsIntInput(ctx context.Context, v interface{}) (*model.OperatorsIntInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputoperatorsIntInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOoperatorsStringInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐOperatorsStringInput(ctx context.Context, v interface{}) (*model.OperatorsStringInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputoperatorsStringInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 // endregion ***************************** type.gotpl *****************************
