@@ -18,6 +18,7 @@ func (a *Year) GetYears() []*model.Year {
 	}
 
 	res, err := query.Query()
+	defer res.Close()
 	if err != nil {
 		log.Fatal(err)
 	}

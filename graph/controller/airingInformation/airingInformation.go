@@ -19,6 +19,7 @@ func (a *AiringInformation) GetAiringInformation(id string) model.AiringInformat
 	}
 
 	res, err := query.Query(id)
+	defer res.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
