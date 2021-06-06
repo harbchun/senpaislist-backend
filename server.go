@@ -5,11 +5,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/go-chi/chi"
+	"github.com/gorilla/websocket"
+	"github.com/rs/cors"
+
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/harrisonwjs/senpaislist-backend/database"
 	"github.com/harrisonwjs/senpaislist-backend/graph"
@@ -27,6 +32,7 @@ const defaultPort = "5001"
 
 func main() {
 	log.Printf("Starting up...")
+
 	m, err := migrate.New(
 		"file://migrations",
 		"postgres://postgres:championsclub123@postgres:5432/postgres?sslmode=disable")
@@ -45,6 +51,17 @@ func main() {
 	}
 
 	db := database.InitDB()
+	defer db.Close()
+
+	router := chi.NewRouter()
+
+	// Add CORS middleware around every request
+	// See https://github.com/rs/cors for full option listing
+	router.Use(cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:5001"},
+		AllowCredentials: true,
+		Debug:            false,
+	}).Handler)
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
 		AnimeController:             anime.Anime{DB: db},
@@ -56,9 +73,21 @@ func main() {
 		AnimesGenresController:      animesgenres.AnimesGenres{DB: db},
 	}}))
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	srv.AddTransport(&transport.Websocket{
+		Upgrader: websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				// Check against your desired domains here
+				log.Println(r.Host)
+				return r.Host == "localhost:3000" || r.Host == "localhost:5001"
+			},
+			ReadBufferSize:  1024,
+			WriteBufferSize: 1024,
+		},
+	})
+
+	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	router.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
