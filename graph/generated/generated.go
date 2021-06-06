@@ -566,8 +566,8 @@ input AnimeFilterInput {
   studio: operatorsStringInput
 
   anime_genres: [AnimesGenresFilterInput!]
-
   airing_informations: [AiringInformationsFilterInput]
+  statistics: [StatisticsSortInput!]
 
   _and: [AnimeFilterInput!]
   _or: [AnimeFilterInput!]
@@ -3730,6 +3730,14 @@ func (ec *executionContext) unmarshalInputAnimeFilterInput(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("airing_informations"))
 			it.AiringInformations, err = ec.unmarshalOAiringInformationsFilterInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsFilterInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "statistics":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statistics"))
+			it.Statistics, err = ec.unmarshalOStatisticsSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatisticsSortInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}

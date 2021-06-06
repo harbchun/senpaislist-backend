@@ -46,6 +46,7 @@ type AnimeFilterInput struct {
 	Studio             *OperatorsStringInput            `json:"studio"`
 	AnimeGenres        []*AnimesGenresFilterInput       `json:"anime_genres"`
 	AiringInformations []*AiringInformationsFilterInput `json:"airing_informations"`
+	Statistics         []*StatisticsSortInput           `json:"statistics"`
 	And                []*AnimeFilterInput              `json:"_and"`
 	Or                 []*AnimeFilterInput              `json:"_or"`
 }
