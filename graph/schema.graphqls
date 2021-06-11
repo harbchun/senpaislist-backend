@@ -41,9 +41,9 @@ input AnimeSortInput {
   title: String
   title_jp: String
   
-  anime_genres: [AnimeGenresSortInput!]
-  statistics: [StatisticsSortInput!]
-  airing_informations: [AiringInformationsSortInput!]
+  anime_genres: AnimeGenresSortInput
+  statistics: StatisticsSortInput
+  airing_informations: AiringInformationsSortInput
 
 }
 
