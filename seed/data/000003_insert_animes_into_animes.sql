@@ -3,10 +3,10 @@ INSERT INTO animes (
 )
 VALUES
 (
-    '10bc3e07-1568-4487-988f-180a7f88fcff', 'Jujutsu Kaisen', 'Jujutsu Kaisen JP', 43251, 'Manga', 'Bones', 'The lads in this one really do big damage and everyone is in awe. I love a man with proper chat.', 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fjujutsu-kaisen.fandom.com%2Fwiki%2FJujutsu_Kaisen_(Anime)&psig=AOvVaw1lVPqXGppemildW_78a_qn&ust=1622254965946000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCJCvt-mo6_ACFQAAAAAdAAAAABAD'
+    '10bc3e07-1568-4487-988f-180a7f88fcff', 'Jujutsu Kaisen', 'Jujutsu Kaisen JP', 43251, 'Manga', 'Bones', 'The lads in this one really do big damage and everyone is in awe. I love a man with proper chat.', 'https://m.media-amazon.com/images/M/MV5BNzQyYzU3Y2MtOWY2Yy00ZGM2LTg3ZTUtMDJkZTJiMmEzMjYxXkEyXkFqcGdeQXVyMTI2NTY3NDg5._V1_.jpg'
 ),
 (
-    '576b3f15-a513-4368-be2a-26cd6f6149a4', 'One Piece', 'One Piece JP', 51251, 'Manga', 'Wick', 'The lads in this one also do big damage and everyone is in awe at luffy. I love football.', 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.imdb.com%2Ftitle%2Ftt0388629%2F&psig=AOvVaw10XI-AkiAPMRHz_TSGpZH6&ust=1622255053504000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCJCstJSp6_ACFQAAAAAdAAAAABAI'
+    '576b3f15-a513-4368-be2a-26cd6f6149a4', 'One Piece', 'One Piece JP', 51251, 'Manga', 'Wick', 'The lads in this one also do big damage and everyone is in awe at luffy. I love football.', 'https://m.media-amazon.com/images/M/MV5BODcwNWE3OTMtMDc3MS00NDFjLWE1OTAtNDU3NjgxODMxY2UyXkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_.jpg'
 ),
 (
     '3b12e6e4-6f4c-470a-8af4-f0af4ab28118', 'Boku no Hero Academia', 'Boku no Hero Academia JP', 63231, 'Manga', 'Bones', 'This one is a really shit one. No one does any damage of any sort. Crybabies and flashbacks galore.', 'https://m.media-amazon.com/images/M/MV5BNmQzYmE2MGEtZjk4YS00YmVjLWEwZWMtODRkMjc4MTM5N2I3XkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_.jpg'
@@ -21,7 +21,7 @@ VALUES
     'd4f14806-57c1-4a23-8a96-697a1adcbc5a', 'Mushoku Tensei: Isekai Ittara Honki Dasu', 'Mushoku Tensei: Isekai Ittara Honki Dasu JP', 93352, 'Light Novel', 'Studio Bind', 'Lots of pedophilic sexual energy in this one. Other than that its quite pog how my man thinkgs about how hes gonna go on about doing things and planning out his life.', 'https://cdn.myanimelist.net/images/anime/1068/111129.jpg'
 ),
 (
-    '49bf000b-bd52-4eda-a618-f3e630711f0c', 'Enn Enn no Shouboutai: Ni no Shou', 'Enn Enn no Shouboutai: Ni no Shou JP', 43353, 'Manga', 'David Production', 'You''re lame as hell if you dont like this one. Everyone on reddit saying how they lost interest in this its because they''re virings.', 'https://static.wikia.nocookie.net/fire-brigade-of-flames/images/6/67/Fire_Force_Anime_Part_2_KV.png/revision/latest?cb=20190928155941'
+    '49bf000b-bd52-4eda-a618-f3e630711f0c', 'Enn Enn no Shouboutai: Ni no Shou', 'Enn Enn no Shouboutai: Ni no Shou JP', 43353, 'Manga', 'David Production', 'You''re lame as hell if you dont like this one. Everyone on reddit saying how they lost interest in this its because they''re virings.', 'https://upload.wikimedia.org/wikipedia/en/0/06/Fire_Force%2C_Volume_1.jpg'
 ),
 (
     '2bd4e382-a2a9-406d-8223-9a93a05f9058', 'Haikyuu!!: To the Top 2nd Cour', 'Haikyuu!!: To the Top 2nd Cour JP', 99999, 'Manga', 'Production I.G', 'Not watching this anime is a feminine trait. Just some boys playing some volley ball. Main character is fucking annoying but other than that its top.', 'https://i.pinimg.com/originals/b1/0d/87/b10d8790795be6a7e625a549728ae528.jpg'
@@ -42,7 +42,7 @@ VALUES
     '2405af84-7912-4b0a-a99e-068b2a06d671', 'Dr.Stone', 'Dr.Stone JP', 100201, 'Manga', 'TMS Entertainment', 'For people with no personality who love to roleplay to love science and is an epic memer. Boring anime.', 'https://images-na.ssl-images-amazon.com/images/I/91Op%2Bk2Z2GL._SY445_.jpg'
 ),
 (
-    'a60120b0-ee6f-4c21-8f09-d9c5d81b4b3a', 'Vinland Saga', 'Vinland Saga JP', 102201, 'Manga', 'WIT Studio', 'One of the best anime series ever made. Only chads watch this.', 'https://images-na.ssl-images-amazon.com/images/I/91Op%2Bk2Z2GL._SY445_.jpg'
+    'a60120b0-ee6f-4c21-8f09-d9c5d81b4b3a', 'Vinland Saga', 'Vinland Saga JP', 102201, 'Manga', 'WIT Studio', 'One of the best anime series ever made. Only chads watch this.', 'https://m.media-amazon.com/images/M/MV5BN2UwOTMwMjMtZTE5MS00YmY4LTg4YjAtZDE3ZTg3YTU5MmQ2XkEyXkFqcGdeQXVyODEyMDIxNDY@._V1_.jpg'
 ),
 (
     'c6b707fa-be85-4a88-be15-1e635b673bc7', 'Beastars', 'Beastars JP', 102201, 'Manga', 'Orange', 'Bunny :)))', 'https://cdn.myanimelist.net/images/anime/1234/102008.jpg'
