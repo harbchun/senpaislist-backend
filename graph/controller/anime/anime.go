@@ -22,15 +22,19 @@ func sortFunc(f *model.AnimeSortInput, j string) (string, string, string) {
 }
 
 func animeSortInput(f *model.AnimeSortInput, j string) (string, string, string) {
-	if len(f.Statistics) > 0 {
-		for _, sort := range f.Statistics {
-			if sort != nil {
-				return statisticsSortInput(sort, j)
-			}
+	s := ""
+
+	if f.Title != nil {
+		if *f.Title == "asc" {
+			s = " ORDER BY animes.title ASC"
+		} else {
+			s = " ORDER BY animes.title DESC"
 		}
+	} else if f.Statistics != nil {
+		return statisticsSortInput(f.Statistics, j)
 	}
 
-	return j, "", ""
+	return j, s, ""
 }
 
 func statisticsSortInput(f *model.StatisticsSortInput, j string) (string, string, string) {
@@ -46,8 +50,17 @@ func statisticsSortInput(f *model.StatisticsSortInput, j string) (string, string
 			s = " ORDER BY statistics.popularity DESC"
 		}
 		g = ", statistics.popularity "
+	} else if f.Score != nil {
+		if !strings.Contains(j, "INNER JOIN statistics ON animes.id = statistics.anime_id") {
+			j += " INNER JOIN statistics ON animes.id = statistics.anime_id "
+		}
+		if *f.Score == "asc" {
+			s = " ORDER BY statistics.score ASC"
+		} else {
+			s = " ORDER BY statistics.score DESC"
+		}
+		g = ", statistics.score "
 	}
-
 	return j, s, g
 }
 
