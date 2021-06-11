@@ -56,11 +56,11 @@ type AnimeGenresSortInput struct {
 }
 
 type AnimeSortInput struct {
-	Title              *string                        `json:"title"`
-	TitleJp            *string                        `json:"title_jp"`
-	AnimeGenres        []*AnimeGenresSortInput        `json:"anime_genres"`
-	Statistics         []*StatisticsSortInput         `json:"statistics"`
-	AiringInformations []*AiringInformationsSortInput `json:"airing_informations"`
+	Title              *string                      `json:"title"`
+	TitleJp            *string                      `json:"title_jp"`
+	AnimeGenres        *AnimeGenresSortInput        `json:"anime_genres"`
+	Statistics         *StatisticsSortInput         `json:"statistics"`
+	AiringInformations *AiringInformationsSortInput `json:"airing_informations"`
 }
 
 type AnimesGenres struct {
