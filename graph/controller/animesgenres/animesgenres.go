@@ -18,6 +18,7 @@ func (a *AnimesGenres) GetAnimeGenres(id string) []*model.AnimesGenres {
 	}
 
 	res, err := query.Query(id)
+	defer res.Close()
 	if err != nil {
 		log.Fatal(err)
 	}

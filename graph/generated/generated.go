@@ -566,8 +566,8 @@ input AnimeFilterInput {
   studio: operatorsStringInput
 
   anime_genres: [AnimesGenresFilterInput!]
-
   airing_informations: [AiringInformationsFilterInput]
+  statistics: [StatisticsSortInput!]
 
   _and: [AnimeFilterInput!]
   _or: [AnimeFilterInput!]
@@ -587,9 +587,9 @@ input AnimeSortInput {
   title: String
   title_jp: String
   
-  anime_genres: [AnimeGenresSortInput!]
-  statistics: [StatisticsSortInput!]
-  airing_informations: [AiringInformationsSortInput!]
+  anime_genres: AnimeGenresSortInput
+  statistics: StatisticsSortInput
+  airing_informations: AiringInformationsSortInput
 
 }
 
@@ -3733,6 +3733,14 @@ func (ec *executionContext) unmarshalInputAnimeFilterInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "statistics":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statistics"))
+			it.Statistics, err = ec.unmarshalOStatisticsSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatisticsSortInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "_and":
 			var err error
 
@@ -3801,7 +3809,7 @@ func (ec *executionContext) unmarshalInputAnimeSortInput(ctx context.Context, ob
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("anime_genres"))
-			it.AnimeGenres, err = ec.unmarshalOAnimeGenresSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeGenresSortInputᚄ(ctx, v)
+			it.AnimeGenres, err = ec.unmarshalOAnimeGenresSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeGenresSortInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3809,7 +3817,7 @@ func (ec *executionContext) unmarshalInputAnimeSortInput(ctx context.Context, ob
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statistics"))
-			it.Statistics, err = ec.unmarshalOStatisticsSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatisticsSortInputᚄ(ctx, v)
+			it.Statistics, err = ec.unmarshalOStatisticsSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatisticsSortInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3817,7 +3825,7 @@ func (ec *executionContext) unmarshalInputAnimeSortInput(ctx context.Context, ob
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("airing_informations"))
-			it.AiringInformations, err = ec.unmarshalOAiringInformationsSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsSortInputᚄ(ctx, v)
+			it.AiringInformations, err = ec.unmarshalOAiringInformationsSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsSortInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4855,11 +4863,6 @@ func (ec *executionContext) marshalNAiringInformation2ᚖgithubᚗcomᚋharrison
 	return ec._AiringInformation(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAiringInformationsSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsSortInput(ctx context.Context, v interface{}) (*model.AiringInformationsSortInput, error) {
-	res, err := ec.unmarshalInputAiringInformationsSortInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) marshalNAnime2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Anime) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -4909,11 +4912,6 @@ func (ec *executionContext) marshalNAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpai
 
 func (ec *executionContext) unmarshalNAnimeFilterInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeFilterInput(ctx context.Context, v interface{}) (*model.AnimeFilterInput, error) {
 	res, err := ec.unmarshalInputAnimeFilterInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNAnimeGenresSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeGenresSortInput(ctx context.Context, v interface{}) (*model.AnimeGenresSortInput, error) {
-	res, err := ec.unmarshalInputAnimeGenresSortInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -5457,28 +5455,12 @@ func (ec *executionContext) unmarshalOAiringInformationsFilterInput2ᚖgithubᚗ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOAiringInformationsSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsSortInputᚄ(ctx context.Context, v interface{}) ([]*model.AiringInformationsSortInput, error) {
+func (ec *executionContext) unmarshalOAiringInformationsSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsSortInput(ctx context.Context, v interface{}) (*model.AiringInformationsSortInput, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.AiringInformationsSortInput, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNAiringInformationsSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAiringInformationsSortInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
+	res, err := ec.unmarshalInputAiringInformationsSortInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOAnime2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnime(ctx context.Context, sel ast.SelectionSet, v *model.Anime) graphql.Marshaler {
@@ -5520,28 +5502,12 @@ func (ec *executionContext) unmarshalOAnimeFilterInput2ᚖgithubᚗcomᚋharriso
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOAnimeGenresSortInput2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeGenresSortInputᚄ(ctx context.Context, v interface{}) ([]*model.AnimeGenresSortInput, error) {
+func (ec *executionContext) unmarshalOAnimeGenresSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeGenresSortInput(ctx context.Context, v interface{}) (*model.AnimeGenresSortInput, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.AnimeGenresSortInput, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNAnimeGenresSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeGenresSortInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
+	res, err := ec.unmarshalInputAnimeGenresSortInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOAnimeSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimeSortInput(ctx context.Context, v interface{}) (*model.AnimeSortInput, error) {
@@ -5731,6 +5697,14 @@ func (ec *executionContext) unmarshalOStatisticsSortInput2ᚕᚖgithubᚗcomᚋh
 		}
 	}
 	return res, nil
+}
+
+func (ec *executionContext) unmarshalOStatisticsSortInput2ᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐStatisticsSortInput(ctx context.Context, v interface{}) (*model.StatisticsSortInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputStatisticsSortInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

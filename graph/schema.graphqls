@@ -20,8 +20,8 @@ input AnimeFilterInput {
   studio: operatorsStringInput
 
   anime_genres: [AnimesGenresFilterInput!]
-
   airing_informations: [AiringInformationsFilterInput]
+  statistics: [StatisticsSortInput!]
 
   _and: [AnimeFilterInput!]
   _or: [AnimeFilterInput!]
@@ -41,9 +41,9 @@ input AnimeSortInput {
   title: String
   title_jp: String
   
-  anime_genres: [AnimeGenresSortInput!]
-  statistics: [StatisticsSortInput!]
-  airing_informations: [AiringInformationsSortInput!]
+  anime_genres: AnimeGenresSortInput
+  statistics: StatisticsSortInput
+  airing_informations: AiringInformationsSortInput
 
 }
 

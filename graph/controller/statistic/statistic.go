@@ -19,6 +19,7 @@ func (a *Statistic) GetStatistic(id string) model.Statistic {
 	}
 
 	res, err := query.Query(id)
+	defer res.Close()
 	if err != nil {
 		log.Fatal(err)
 	}

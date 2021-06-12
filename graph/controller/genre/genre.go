@@ -18,6 +18,7 @@ func (a *Genre) GetGenres() []*model.Genre {
 	}
 
 	res, err := query.Query()
+	defer res.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
