@@ -74,7 +74,6 @@ type AnimesGenresFilterInput struct {
 }
 
 type Genre struct {
-	ID          string          `json:"id"`
 	Genre       string          `json:"genre"`
 	AnimesGenre []*AnimesGenres `json:"animes_genre"`
 }
@@ -103,8 +102,7 @@ type StatisticsSortInput struct {
 }
 
 type Year struct {
-	ID   string `json:"id"`
-	Year int    `json:"year"`
+	Year int `json:"year"`
 }
 
 type OperatorsIDInput struct {

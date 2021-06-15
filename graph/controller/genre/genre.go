@@ -27,7 +27,7 @@ func (a *Genre) GetGenres() []*model.Genre {
 
 	for res.Next() {
 		var genre model.Genre
-		err = res.Scan(&genre.ID, &genre.Genre)
+		err = res.Scan(&genre.Genre)
 
 		if err != nil {
 			log.Fatal(err)

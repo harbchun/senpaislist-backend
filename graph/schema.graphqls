@@ -87,13 +87,11 @@ type AiringInformation {
 }
 
 type Genre {
-  id: ID!
   genre: String!
   animes_genre: [AnimesGenres!]!
 }
 
 type Year {
-  id: ID!
   year: Int!
 }
 
