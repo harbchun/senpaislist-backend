@@ -78,7 +78,6 @@ type ComplexityRoot struct {
 	Genre struct {
 		AnimesGenre func(childComplexity int) int
 		Genre       func(childComplexity int) int
-		ID          func(childComplexity int) int
 	}
 
 	Query struct {
@@ -109,7 +108,6 @@ type ComplexityRoot struct {
 	}
 
 	Year struct {
-		ID   func(childComplexity int) int
 		Year func(childComplexity int) int
 	}
 }
@@ -317,13 +315,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Genre.Genre(childComplexity), true
 
-	case "Genre.id":
-		if e.complexity.Genre.ID == nil {
-			break
-		}
-
-		return e.complexity.Genre.ID(childComplexity), true
-
 	case "Query.airingInformation":
 		if e.complexity.Query.AiringInformation == nil {
 			break
@@ -480,13 +471,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Statistic.ScoredBy(childComplexity), true
 
-	case "Year.id":
-		if e.complexity.Year.ID == nil {
-			break
-		}
-
-		return e.complexity.Year.ID(childComplexity), true
-
 	case "Year.year":
 		if e.complexity.Year.Year == nil {
 			break
@@ -633,13 +617,11 @@ type AiringInformation {
 }
 
 type Genre {
-  id: ID!
   genre: String!
   animes_genre: [AnimesGenres!]!
 }
 
 type Year {
-  id: ID!
   year: Int!
 }
 
@@ -1619,41 +1601,6 @@ func (ec *executionContext) _AnimesGenres_genre(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Genre_id(ctx context.Context, field graphql.CollectedField, obj *model.Genre) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Genre",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Genre_genre(ctx context.Context, field graphql.CollectedField, obj *model.Genre) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2456,41 +2403,6 @@ func (ec *executionContext) _Statistic_rating(ctx context.Context, field graphql
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Year_id(ctx context.Context, field graphql.CollectedField, obj *model.Year) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Year",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Year_year(ctx context.Context, field graphql.CollectedField, obj *model.Year) (ret graphql.Marshaler) {
@@ -4301,11 +4213,6 @@ func (ec *executionContext) _Genre(ctx context.Context, sel ast.SelectionSet, ob
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Genre")
-		case "id":
-			out.Values[i] = ec._Genre_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "genre":
 			out.Values[i] = ec._Genre_genre(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -4583,11 +4490,6 @@ func (ec *executionContext) _Year(ctx context.Context, sel ast.SelectionSet, obj
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Year")
-		case "id":
-			out.Values[i] = ec._Year_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "year":
 			out.Values[i] = ec._Year_year(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

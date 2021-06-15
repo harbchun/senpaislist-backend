@@ -27,7 +27,7 @@ func (a *Year) GetYears() []*model.Year {
 
 	for res.Next() {
 		var year model.Year
-		err = res.Scan(&year.ID, &year.Year)
+		err = res.Scan(&year.Year)
 
 		if err != nil {
 			log.Fatal(err)
