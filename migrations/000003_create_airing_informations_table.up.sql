@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS airing_informations(
    num_episodes INT,
    episode_duration VARCHAR,
    airing BOOLEAN,
+   syoboi_tid INT UNIQUE,
    CONSTRAINT fk_anime_id FOREIGN KEY (anime_id) REFERENCES animes (id),
-   CONSTRAINT fk_season FOREIGN KEY (season) REFERENCES seasons (season)
+   CONSTRAINT fk_season FOREIGN KEY (season) REFERENCES seasons (season),
+   CONSTRAINT fk_syoboi_id FOREIGN KEY (syoboi_tid) REFERENCES animes (syoboi_tid)
 );
