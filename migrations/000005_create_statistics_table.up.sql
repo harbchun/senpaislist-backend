@@ -5,6 +5,5 @@ CREATE TABLE IF NOT EXISTS statistics(
    rank int,
    popularity INT,
    favorites int,
-   rating INT,
    CONSTRAINT fk_anime_id FOREIGN KEY (anime_id) REFERENCES animes (id)
 );
