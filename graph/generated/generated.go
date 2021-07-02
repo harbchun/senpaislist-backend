@@ -53,6 +53,7 @@ type ComplexityRoot struct {
 		StartDay        func(childComplexity int) int
 		StartMonth      func(childComplexity int) int
 		StartYear       func(childComplexity int) int
+		SyoboiTid       func(childComplexity int) int
 		Year            func(childComplexity int) int
 	}
 
@@ -60,12 +61,12 @@ type ComplexityRoot struct {
 		AiringInformation func(childComplexity int) int
 		AnimeGenres       func(childComplexity int) int
 		ID                func(childComplexity int) int
-		ImageURL          func(childComplexity int) int
+		ImageID           func(childComplexity int) int
 		Source            func(childComplexity int) int
 		Statistic         func(childComplexity int) int
 		Studio            func(childComplexity int) int
 		Summary           func(childComplexity int) int
-		Tid               func(childComplexity int) int
+		SyoboiTid         func(childComplexity int) int
 		Title             func(childComplexity int) int
 		TitleJp           func(childComplexity int) int
 	}
@@ -73,6 +74,11 @@ type ComplexityRoot struct {
 	AnimesGenres struct {
 		AnimeID func(childComplexity int) int
 		Genre   func(childComplexity int) int
+	}
+
+	BroadcastTime struct {
+		SyoboiTid func(childComplexity int) int
+		Time      func(childComplexity int) int
 	}
 
 	Genre struct {
@@ -203,6 +209,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AiringInformation.StartYear(childComplexity), true
 
+	case "AiringInformation.syoboi_tid":
+		if e.complexity.AiringInformation.SyoboiTid == nil {
+			break
+		}
+
+		return e.complexity.AiringInformation.SyoboiTid(childComplexity), true
+
 	case "AiringInformation.year":
 		if e.complexity.AiringInformation.Year == nil {
 			break
@@ -231,12 +244,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Anime.ID(childComplexity), true
 
-	case "Anime.image_url":
-		if e.complexity.Anime.ImageURL == nil {
+	case "Anime.image_id":
+		if e.complexity.Anime.ImageID == nil {
 			break
 		}
 
-		return e.complexity.Anime.ImageURL(childComplexity), true
+		return e.complexity.Anime.ImageID(childComplexity), true
 
 	case "Anime.source":
 		if e.complexity.Anime.Source == nil {
@@ -266,12 +279,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Anime.Summary(childComplexity), true
 
-	case "Anime.tid":
-		if e.complexity.Anime.Tid == nil {
+	case "Anime.syoboi_tid":
+		if e.complexity.Anime.SyoboiTid == nil {
 			break
 		}
 
-		return e.complexity.Anime.Tid(childComplexity), true
+		return e.complexity.Anime.SyoboiTid(childComplexity), true
 
 	case "Anime.title":
 		if e.complexity.Anime.Title == nil {
@@ -300,6 +313,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AnimesGenres.Genre(childComplexity), true
+
+	case "BroadcastTime.syoboi_tid":
+		if e.complexity.BroadcastTime.SyoboiTid == nil {
+			break
+		}
+
+		return e.complexity.BroadcastTime.SyoboiTid(childComplexity), true
+
+	case "BroadcastTime.time":
+		if e.complexity.BroadcastTime.Time == nil {
+			break
+		}
+
+		return e.complexity.BroadcastTime.Time(childComplexity), true
 
 	case "Genre.animes_genre":
 		if e.complexity.Genre.AnimesGenre == nil {
@@ -530,16 +557,16 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 var sources = []*ast.Source{
 	{Name: "graph/schema.graphqls", Input: `type Anime {
   id: ID!
-  tid: Int!
   title: String!
   title_jp: String!
   summary: String!
   source: String!
   studio: String!
-  image_url: String!
+  image_id: String!
   statistic: Statistic!
   airing_information: AiringInformation!
   anime_genres: [AnimesGenres!]!
+  syoboi_tid: Int!
 }
 
 input AnimeFilterInput {
@@ -574,7 +601,6 @@ input AnimeSortInput {
   anime_genres: AnimeGenresSortInput
   statistics: StatisticsSortInput
   airing_informations: AiringInformationsSortInput
-
 }
 
 input AnimeGenresSortInput {
@@ -601,7 +627,7 @@ type Statistic {
   rank: Int!
   popularity: Int!
   favorites: Int!
-  rating: Int!
+  rating: String!
 }
 
 type AiringInformation {
@@ -614,6 +640,7 @@ type AiringInformation {
   num_episodes: Int!
   episode_duration: Int!
   airing: Boolean!
+  syoboi_tid: Int!
 }
 
 type Genre {
@@ -658,6 +685,11 @@ input operatorsIdInput {
   _neq: ID
   _in: [ID!]
   _nin: [ID!]
+}
+
+type BroadcastTime {
+  syoboi_tid: Int!
+  time: Float!
 }
 
 type Query {
@@ -1146,6 +1178,41 @@ func (ec *executionContext) _AiringInformation_airing(ctx context.Context, field
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _AiringInformation_syoboi_tid(ctx context.Context, field graphql.CollectedField, obj *model.AiringInformation) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AiringInformation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SyoboiTid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Anime_id(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1179,41 +1246,6 @@ func (ec *executionContext) _Anime_id(ctx context.Context, field graphql.Collect
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Anime_tid(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Anime",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Tid, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Anime_title(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
@@ -1391,7 +1423,7 @@ func (ec *executionContext) _Anime_studio(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Anime_image_url(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
+func (ec *executionContext) _Anime_image_id(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1409,7 +1441,7 @@ func (ec *executionContext) _Anime_image_url(ctx context.Context, field graphql.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ImageURL, nil
+		return obj.ImageID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1531,6 +1563,41 @@ func (ec *executionContext) _Anime_anime_genres(ctx context.Context, field graph
 	return ec.marshalNAnimesGenres2ᚕᚖgithubᚗcomᚋharrisonwjsᚋsenpaislistᚑbackendᚋgraphᚋmodelᚐAnimesGenresᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Anime_syoboi_tid(ctx context.Context, field graphql.CollectedField, obj *model.Anime) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Anime",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SyoboiTid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _AnimesGenres_anime_id(ctx context.Context, field graphql.CollectedField, obj *model.AnimesGenres) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1599,6 +1666,76 @@ func (ec *executionContext) _AnimesGenres_genre(ctx context.Context, field graph
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _BroadcastTime_syoboi_tid(ctx context.Context, field graphql.CollectedField, obj *model.BroadcastTime) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "BroadcastTime",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SyoboiTid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _BroadcastTime_time(ctx context.Context, field graphql.CollectedField, obj *model.BroadcastTime) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "BroadcastTime",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Time, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Genre_genre(ctx context.Context, field graphql.CollectedField, obj *model.Genre) (ret graphql.Marshaler) {
@@ -2400,9 +2537,9 @@ func (ec *executionContext) _Statistic_rating(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Year_year(ctx context.Context, field graphql.CollectedField, obj *model.Year) (ret graphql.Marshaler) {
@@ -4055,6 +4192,11 @@ func (ec *executionContext) _AiringInformation(ctx context.Context, sel ast.Sele
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "syoboi_tid":
+			out.Values[i] = ec._AiringInformation_syoboi_tid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4079,11 +4221,6 @@ func (ec *executionContext) _Anime(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = graphql.MarshalString("Anime")
 		case "id":
 			out.Values[i] = ec._Anime_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "tid":
-			out.Values[i] = ec._Anime_tid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -4112,8 +4249,8 @@ func (ec *executionContext) _Anime(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "image_url":
-			out.Values[i] = ec._Anime_image_url(ctx, field, obj)
+		case "image_id":
+			out.Values[i] = ec._Anime_image_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -4159,6 +4296,11 @@ func (ec *executionContext) _Anime(ctx context.Context, sel ast.SelectionSet, ob
 				}
 				return res
 			})
+		case "syoboi_tid":
+			out.Values[i] = ec._Anime_syoboi_tid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4188,6 +4330,38 @@ func (ec *executionContext) _AnimesGenres(ctx context.Context, sel ast.Selection
 			}
 		case "genre":
 			out.Values[i] = ec._AnimesGenres_genre(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var broadcastTimeImplementors = []string{"BroadcastTime"}
+
+func (ec *executionContext) _BroadcastTime(ctx context.Context, sel ast.SelectionSet, obj *model.BroadcastTime) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, broadcastTimeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("BroadcastTime")
+		case "syoboi_tid":
+			out.Values[i] = ec._BroadcastTime_syoboi_tid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "time":
+			out.Values[i] = ec._BroadcastTime_time(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4876,6 +5050,21 @@ func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interf
 
 func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
 	res := graphql.MarshalBoolean(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	res, err := graphql.UnmarshalFloat(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloat(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
