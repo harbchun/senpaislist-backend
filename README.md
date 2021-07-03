@@ -27,3 +27,9 @@ Seed Database:
 ---
  - docker-compose exec backend make seed
 ---
+
+Seed Production/Staging Database:
+
+---
+ - docker-compose exec backend make seed_prod
+---

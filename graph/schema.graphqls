@@ -1,15 +1,15 @@
 type Anime {
   id: ID!
-  tid: Int!
   title: String!
   title_jp: String!
   summary: String!
   source: String!
   studio: String!
-  image_url: String!
+  image_id: String!
   statistic: Statistic!
   airing_information: AiringInformation!
   anime_genres: [AnimesGenres!]!
+  syoboi_tid: Int!
 }
 
 input AnimeFilterInput {
@@ -44,7 +44,6 @@ input AnimeSortInput {
   anime_genres: AnimeGenresSortInput
   statistics: StatisticsSortInput
   airing_informations: AiringInformationsSortInput
-
 }
 
 input AnimeGenresSortInput {
@@ -71,7 +70,7 @@ type Statistic {
   rank: Int!
   popularity: Int!
   favorites: Int!
-  rating: Int!
+  rating: String!
 }
 
 type AiringInformation {
@@ -84,6 +83,7 @@ type AiringInformation {
   num_episodes: Int!
   episode_duration: Int!
   airing: Boolean!
+  syoboi_tid: Int!
 }
 
 type Genre {
@@ -128,6 +128,11 @@ input operatorsIdInput {
   _neq: ID
   _in: [ID!]
   _nin: [ID!]
+}
+
+type BroadcastTime {
+  syoboi_tid: Int!
+  time: Float!
 }
 
 type Query {

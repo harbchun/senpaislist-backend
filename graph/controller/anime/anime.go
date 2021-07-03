@@ -179,7 +179,7 @@ func (a *Anime) GetAnime(id string) model.Anime {
 	var anime model.Anime
 
 	if res.Next() {
-		err = res.Scan(&anime.ID, &anime.Title, &anime.TitleJp, &anime.Tid, &anime.Source, &anime.Studio, &anime.Summary, &anime.ImageURL)
+		err = res.Scan(&anime.ID, &anime.Title, &anime.TitleJp, &anime.SyoboiTid, &anime.Source, &anime.Studio, &anime.Summary, &anime.ImageID)
 
 		if err != nil {
 			log.Fatal(err)
@@ -214,7 +214,7 @@ func (a *Anime) GetAnimes(filter *model.AnimeFilterInput, orderBy *model.AnimeSo
 
 	for res.Next() {
 		var anime model.Anime
-		err = res.Scan(&anime.ID, &anime.Title, &anime.TitleJp, &anime.Tid, &anime.Source, &anime.Studio, &anime.Summary, &anime.ImageURL)
+		err = res.Scan(&anime.ID, &anime.Title, &anime.TitleJp, &anime.SyoboiTid, &anime.Source, &anime.Studio, &anime.Summary, &anime.ImageID)
 
 		if err != nil {
 			log.Fatal(err)
