@@ -33,3 +33,10 @@ Seed Production/Staging Database:
 ---
  - docker-compose exec backend make seed_prod
 ---
+
+Build image
+
+---
+- docker build --target production
+- APP_ENV=production docker-compose up --build
+---
