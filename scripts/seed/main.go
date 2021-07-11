@@ -123,6 +123,8 @@ func main() {
 	broadcastTimesInsertModels := []*BroadcastTimeStruct{}
 	broadcastTimesMap := make(map[string][]float64)
 
+	fmt.Println("Fetching data from the S3 buckets")
+
 	// loop through all s3 objects for broadcast info
 	for _, broadcastTimesObject := range broadcastTimesObjects.Contents {
 		broadcastTimesObjectReqInput := &s3.GetObjectInput{
@@ -232,6 +234,10 @@ func main() {
 		}
 	}
 
+	fmt.Println("Fetching Complete")
+
+	fmt.Println("Inserting into Postgres Database")
+
 	err, errorQuery := seedStruct.InsertAnimes(animeInsertModels)
 	if err != nil {
 		if errorQuery != nil {
@@ -279,4 +285,6 @@ func main() {
 		}
 		panic(err)
 	}
+
+	fmt.Println("Seeding Successful!")
 }
