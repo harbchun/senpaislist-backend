@@ -1,6 +1,62 @@
-version: "3.8"
+version: '3.8'
 services:
-  web:
-    build: .
+  postgres:
+    image: postgres:13.3
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: championsclub123
+      POSTGRES_DB: postgres
+    networks:
+      senpaislist-network:
+          aliases:
+              - postgres
+    ports: 
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  pgadmin:
+    image: dpage/pgadmin4:5.3
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: postgres@email.com
+      PGADMIN_DEFAULT_PASSWORD: championsclub123
+      PGADMIN_LISTEN_PORT: 80
     ports:
-      - "8888:8888"
+    - "8080:80"
+    volumes:
+    - pgadmin-data:/var/lib/pgadmin
+    networks:
+      senpaislist-network:
+          aliases:
+              - pgadmin
+    links:
+    - "postgres:pgsql-server"
+  backend:
+    build: 
+      context: .
+      target: ${APP_ENV:-development}
+    ports:
+      - "5001:5001"
+    volumes:
+      - "./:/app"
+    networks:
+      senpaislist-network:
+          aliases:
+              - backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  db_data:
+  pgadmin-data:
+
+networks:
+  senpaislist-network:
+    external: true

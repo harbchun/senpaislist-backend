@@ -1,0 +1,5 @@
+vendor
+gin-bin
+tmp
+graph/generated/
+script/seed/.env

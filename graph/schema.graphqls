@@ -1,0 +1,148 @@
+type Anime {
+  id: ID!
+  title: String!
+  title_jp: String!
+  summary: String!
+  source: String!
+  studio: String!
+  image_id: String!
+  statistic: Statistic!
+  airing_information: AiringInformation!
+  anime_genres: [AnimesGenres!]!
+  syoboi_tid: Int!
+}
+
+input AnimeFilterInput {
+  id: operatorsIdInput
+  title: operatorsStringInput
+  title_jp: operatorsStringInput
+  tid: operatorsIdInput
+  studio: operatorsStringInput
+
+  anime_genres: [AnimesGenresFilterInput!]
+  airing_informations: [AiringInformationsFilterInput]
+  statistics: [StatisticsSortInput!]
+
+  _and: [AnimeFilterInput!]
+  _or: [AnimeFilterInput!]
+}
+
+input AnimesGenresFilterInput {
+  anime_id: operatorsIdInput
+  genre: operatorsStringInput
+}
+
+input AiringInformationsFilterInput {
+  year: operatorsIntInput
+  season: operatorsStringInput
+}
+
+input AnimeSortInput {
+  title: String
+  title_jp: String
+  
+  anime_genres: AnimeGenresSortInput
+  statistics: StatisticsSortInput
+  airing_informations: AiringInformationsSortInput
+}
+
+input AnimeGenresSortInput {
+  genre: String
+}
+
+input AiringInformationsSortInput {
+  year: String
+  season: String
+}
+
+input StatisticsSortInput {
+  popularity: String
+  score: String
+  rank: String
+  rating: String
+  favorites: String
+}
+
+type Statistic {
+  anime_id: ID!
+  score: Int!
+  scored_by: Int!
+  rank: Int!
+  popularity: Int!
+  favorites: Int!
+  rating: String!
+}
+
+type AiringInformation {
+  anime_id: ID!
+  start_day: Int!
+  start_month: Int!
+  start_year: Int!
+  year: Int!
+  season: String!
+  num_episodes: Int!
+  episode_duration: Int!
+  airing: Boolean!
+  syoboi_tid: Int!
+}
+
+type Genre {
+  genre: String!
+  animes_genre: [AnimesGenres!]!
+}
+
+type Year {
+  year: Int!
+}
+
+type Season {
+  id: ID!
+  season: String!
+}
+
+type AnimesGenres {
+  anime_id: ID!
+  genre: String!
+}
+
+input operatorsStringInput {
+  _eq: String
+  _neq: String
+  _in: [String!]
+  _nin: [String!]
+}
+
+input operatorsIntInput {
+  _eq: Int
+  _neq: Int
+  _gt: Int
+  _gte: Int
+  _lt: Int
+  _lte: Int
+  _in: [Int!]
+  _nin: [Int!]
+}
+
+input operatorsIdInput {
+  _eq: ID
+  _neq: ID
+  _in: [ID!]
+  _nin: [ID!]
+}
+
+type BroadcastTime {
+  syoboi_tid: Int!
+  time: Float!
+}
+
+type Query {
+  anime(id: ID!): Anime
+  animes(filter: AnimeFilterInput, order_by: AnimeSortInput): [Anime!]!
+  statistic(id: ID!): Statistic
+  airingInformation(id: ID!): AiringInformation
+  years: [Year!]!
+  genres: [Genre!]!
+  seasons: [Season!]!
+  anime_genres(id: ID!): [AnimesGenres!]!
+  animes_genre(genre: String!): [AnimesGenres!]!
+}
