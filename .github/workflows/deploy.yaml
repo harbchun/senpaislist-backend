@@ -45,3 +45,15 @@ jobs:
             docker build --target ${{ steps.extract_branch.outputs.branch }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+        - name: Pull and redeploy image
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.SSH_HOST }}
+            username: ${{ secrets.SSH_USERNAME }}
+            password: ${{ secrets.SSH_PASSWORD }}
+            port: 22
+            script: |
+              docker login --username AWS -p $(aws ecr get-login-password --region ca-central-1) 402788700696.dkr.ecr.ca-central-1.amazonaws.com
+              docker pull 402788700696.dkr.ecr.ca-central-1.amazonaws.com/sl-backend-${{ steps.extract_branch.outputs.branch }}:latest
+              docker service update --image 402788700696.dkr.ecr.ca-central-1.amazonaws.com/sl-backend-${{ steps.extract_branch.outputs.branch }}:latest ${{ steps.extract_branch.outputs.branch }}-backend_backend
