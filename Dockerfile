@@ -53,6 +53,8 @@ COPY --from=builder /app/migrations /go/migrations
 COPY --from=builder /app/seed /go/seed
 COPY --from=builder /app/scripts /go/scripts
 COPY --from=builder /app/Makefile /go/
+COPY --from=builder /app/go.mod /go/
+COPY --from=builder /app/go.sum /go/
 
 COPY --from=builder /dist/main /
 
