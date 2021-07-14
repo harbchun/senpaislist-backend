@@ -27,21 +27,23 @@ ENV GO111MODULE=on \
 # Build the application
 RUN go build -o main .
 
+WORKDIR /app/scripts/seed
+
+RUN go build -o seed
 # Move to /dist directory as the place for resulting binary folder
 WORKDIR /dist
 
 # Copy binary from build to main folder
 RUN cp /app/main .
 
+RUN cp /app//scripts/seed/seed .
 # final stage
 FROM golang:alpine as staging
 
 COPY --from=builder /app/migrations /go/migrations
 COPY --from=builder /app/seed /go/seed
-COPY --from=builder /app/scripts /go/scripts
 COPY --from=builder /app/Makefile /go/
-COPY --from=builder /app/go.mod /go/
-COPY --from=builder /app/go.sum /go/
+COPY --from=builder /dist/seed /go/scripts/seed/
 
 COPY --from=builder /dist/main /
 
@@ -53,10 +55,8 @@ FROM golang:alpine as production
 
 COPY --from=builder /app/migrations /go/migrations
 COPY --from=builder /app/seed /go/seed
-COPY --from=builder /app/scripts /go/scripts
 COPY --from=builder /app/Makefile /go/
-COPY --from=builder /app/go.mod /go/
-COPY --from=builder /app/go.sum /go/
+COPY --from=builder /dist/seed /go/scripts/seed/
 
 COPY --from=builder /dist/main /
 
