@@ -56,4 +56,4 @@ jobs:
             script: |
               docker login --username AWS -p $(aws ecr get-login-password --region ca-central-1) 402788700696.dkr.ecr.ca-central-1.amazonaws.com
               docker pull 402788700696.dkr.ecr.ca-central-1.amazonaws.com/sl-backend-${{ steps.extract_branch.outputs.branch }}:latest
-              docker service update --image 402788700696.dkr.ecr.ca-central-1.amazonaws.com/sl-backend-${{ steps.extract_branch.outputs.branch }}:latest ${{ steps.extract_branch.outputs.branch }}-backend_backend
+              docker service update --container-label-add last_deployed=$(date -u +%Y-%m-%dT%H:%M:%S) ${{ steps.extract_branch.outputs.branch }}-backend_backend
