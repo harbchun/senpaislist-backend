@@ -21,10 +21,12 @@ import (
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/airingInformation"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/anime"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/animesgenres"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/animesstudios"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/genre"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/season"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/statistic"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/year"
+	"github.com/harrisonwjs/senpaislist-backend/graph/dataloader"
 	"github.com/harrisonwjs/senpaislist-backend/graph/generated"
 )
 
@@ -71,6 +73,7 @@ func main() {
 		YearController:              year.Year{DB: db},
 		SeasonController:            season.Season{DB: db},
 		AnimesGenresController:      animesgenres.AnimesGenres{DB: db},
+		AnimesStudiosController:     animesstudios.AnimesStudios{DB: db},
 	}}))
 
 	srv.AddTransport(&transport.Websocket{
@@ -86,7 +89,7 @@ func main() {
 	})
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	router.Handle("/query", srv)
+	router.Handle("/query", dataloader.DataloaderMiddleware(db, srv))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
