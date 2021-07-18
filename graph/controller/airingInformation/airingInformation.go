@@ -27,7 +27,7 @@ func (a *AiringInformation) GetAiringInformation(id string) model.AiringInformat
 	var airingInformation model.AiringInformation
 
 	if res.Next() {
-		err = res.Scan(&airingInformation.AnimeID, &airingInformation.StartDay, &airingInformation.StartMonth, &airingInformation.StartYear, &airingInformation.Year, &airingInformation.Season, &airingInformation.NumEpisodes, &airingInformation.EpisodeDuration, &airingInformation.Airing)
+		err = res.Scan(&airingInformation.AnimeID, &airingInformation.StartDay, &airingInformation.StartMonth, &airingInformation.StartYear, &airingInformation.Year, &airingInformation.Season, &airingInformation.NumEpisodes, &airingInformation.EpisodeDuration, &airingInformation.Airing, &airingInformation.SyoboiTid)
 
 		if err != nil {
 			log.Fatal(err)

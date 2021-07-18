@@ -6,14 +6,21 @@ package graph
 import (
 	"context"
 
+	"github.com/harrisonwjs/senpaislist-backend/graph/dataloader"
 	"github.com/harrisonwjs/senpaislist-backend/graph/generated"
 	"github.com/harrisonwjs/senpaislist-backend/graph/model"
 )
 
-func (r *animeResolver) Statistic(ctx context.Context, obj *model.Anime) (*model.Statistic, error) {
-	statistic := r.StatisticController.GetStatistic(obj.ID)
+func (r *animeResolver) AnimeStudios(ctx context.Context, obj *model.Anime) ([]*model.AnimesStudios, error) {
+	studio, err := dataloader.For(ctx).AnimesStudiosLoader.Load(obj.ID)
 
-	return &statistic, nil
+	return studio, err
+}
+
+func (r *animeResolver) Statistic(ctx context.Context, obj *model.Anime) (*model.Statistic, error) {
+	statistic, err := dataloader.For(ctx).StatisticLoader.Load(obj.ID)
+
+	return statistic, err
 }
 
 func (r *animeResolver) AiringInformation(ctx context.Context, obj *model.Anime) (*model.AiringInformation, error) {
@@ -23,9 +30,9 @@ func (r *animeResolver) AiringInformation(ctx context.Context, obj *model.Anime)
 }
 
 func (r *animeResolver) AnimeGenres(ctx context.Context, obj *model.Anime) ([]*model.AnimesGenres, error) {
-	animegenres := r.AnimesGenresController.GetAnimeGenres(obj.ID)
+	animegenres, err := dataloader.For(ctx).AnimesGenresLoader.Load(obj.ID)
 
-	return animegenres, nil
+	return animegenres, err
 }
 
 func (r *genreResolver) AnimesGenre(ctx context.Context, obj *model.Genre) ([]*model.AnimesGenres, error) {
