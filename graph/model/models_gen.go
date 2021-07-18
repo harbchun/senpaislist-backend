@@ -3,16 +3,16 @@
 package model
 
 type AiringInformation struct {
-	AnimeID         string `json:"anime_id"`
-	StartDay        int    `json:"start_day"`
-	StartMonth      int    `json:"start_month"`
-	StartYear       int    `json:"start_year"`
-	Year            int    `json:"year"`
-	Season          string `json:"season"`
-	NumEpisodes     int    `json:"num_episodes"`
-	EpisodeDuration int    `json:"episode_duration"`
-	Airing          bool   `json:"airing"`
-	SyoboiTid       int    `json:"syoboi_tid"`
+	AnimeID         string  `json:"anime_id"`
+	StartDay        *int    `json:"start_day"`
+	StartMonth      *int    `json:"start_month"`
+	StartYear       *int    `json:"start_year"`
+	Year            *int    `json:"year"`
+	Season          *string `json:"season"`
+	NumEpisodes     *int    `json:"num_episodes"`
+	EpisodeDuration *string `json:"episode_duration"`
+	Airing          *bool   `json:"airing"`
+	SyoboiTid       *int    `json:"syoboi_tid"`
 }
 
 type AiringInformationsFilterInput struct {
@@ -27,16 +27,16 @@ type AiringInformationsSortInput struct {
 
 type Anime struct {
 	ID                string             `json:"id"`
-	Title             string             `json:"title"`
-	TitleJp           string             `json:"title_jp"`
-	Summary           string             `json:"summary"`
-	Source            string             `json:"source"`
-	Studio            string             `json:"studio"`
-	ImageID           string             `json:"image_id"`
+	Title             *string            `json:"title"`
+	TitleJp           *string            `json:"title_jp"`
+	Summary           *string            `json:"summary"`
+	Source            *string            `json:"source"`
+	AnimeStudios      []*AnimesStudios   `json:"anime_studios"`
+	ImageID           *string            `json:"image_id"`
 	Statistic         *Statistic         `json:"statistic"`
 	AiringInformation *AiringInformation `json:"airing_information"`
 	AnimeGenres       []*AnimesGenres    `json:"anime_genres"`
-	SyoboiTid         int                `json:"syoboi_tid"`
+	SyoboiTid         *int               `json:"syoboi_tid"`
 }
 
 type AnimeFilterInput struct {
@@ -74,6 +74,11 @@ type AnimesGenresFilterInput struct {
 	Genre   *OperatorsStringInput `json:"genre"`
 }
 
+type AnimesStudios struct {
+	AnimeID *string `json:"anime_id"`
+	Studio  *string `json:"studio"`
+}
+
 type BroadcastTime struct {
 	SyoboiTid int     `json:"syoboi_tid"`
 	Time      float64 `json:"time"`
@@ -90,13 +95,13 @@ type Season struct {
 }
 
 type Statistic struct {
-	AnimeID    string `json:"anime_id"`
-	Score      int    `json:"score"`
-	ScoredBy   int    `json:"scored_by"`
-	Rank       int    `json:"rank"`
-	Popularity int    `json:"popularity"`
-	Favorites  int    `json:"favorites"`
-	Rating     string `json:"rating"`
+	AnimeID    string  `json:"anime_id"`
+	Score      *int    `json:"score"`
+	ScoredBy   *int    `json:"scored_by"`
+	Rank       *int    `json:"rank"`
+	Popularity *int    `json:"popularity"`
+	Favorites  *int    `json:"favorites"`
+	Rating     *string `json:"rating"`
 }
 
 type StatisticsSortInput struct {
