@@ -4,6 +4,7 @@ import (
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/airingInformation"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/anime"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/animesgenres"
+	"github.com/harrisonwjs/senpaislist-backend/graph/controller/animesstudios"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/genre"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/season"
 	"github.com/harrisonwjs/senpaislist-backend/graph/controller/statistic"
@@ -23,4 +24,5 @@ type Resolver struct {
 	YearController              year.Year
 	SeasonController            season.Season
 	AnimesGenresController      animesgenres.AnimesGenres
+	AnimesStudiosController     animesstudios.AnimesStudios
 }

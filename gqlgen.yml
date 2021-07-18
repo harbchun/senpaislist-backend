@@ -62,6 +62,8 @@ models:
         resolver: true
       anime_genres:
         resolver: true
+      anime_studios:
+        resolver: true
   Genre:
     fields:
       animes_genre:

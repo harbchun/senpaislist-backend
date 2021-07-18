@@ -1,15 +1,15 @@
 type Anime {
   id: ID!
-  title: String!
-  title_jp: String!
-  summary: String!
-  source: String!
-  studio: String!
-  image_id: String!
-  statistic: Statistic!
-  airing_information: AiringInformation!
+  title: String
+  title_jp: String
+  summary: String
+  source: String
+  anime_studios: [AnimesStudios!]!
+  image_id: String
+  statistic: Statistic
+  airing_information: AiringInformation
   anime_genres: [AnimesGenres!]!
-  syoboi_tid: Int!
+  syoboi_tid: Int
 }
 
 input AnimeFilterInput {
@@ -65,25 +65,25 @@ input StatisticsSortInput {
 
 type Statistic {
   anime_id: ID!
-  score: Int!
-  scored_by: Int!
-  rank: Int!
-  popularity: Int!
-  favorites: Int!
-  rating: String!
+  score: Int
+  scored_by: Int
+  rank: Int
+  popularity: Int
+  favorites: Int
+  rating: String
 }
 
 type AiringInformation {
   anime_id: ID!
-  start_day: Int!
-  start_month: Int!
-  start_year: Int!
-  year: Int!
-  season: String!
-  num_episodes: Int!
-  episode_duration: Int!
-  airing: Boolean!
-  syoboi_tid: Int!
+  start_day: Int
+  start_month: Int
+  start_year: Int
+  year: Int
+  season: String
+  num_episodes: Int
+  episode_duration: String
+  airing: Boolean
+  syoboi_tid: Int
 }
 
 type Genre {
@@ -103,6 +103,11 @@ type Season {
 type AnimesGenres {
   anime_id: ID!
   genre: String!
+}
+
+type AnimesStudios {
+  anime_id: ID
+  studio: String
 }
 
 input operatorsStringInput {

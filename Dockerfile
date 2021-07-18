@@ -43,8 +43,8 @@ FROM golang:alpine as staging
 COPY --from=builder /app/migrations /go/migrations
 COPY --from=builder /app/seed /go/seed
 COPY --from=builder /app/Makefile /go/
-COPY --from=builder /dist/seed /go/scripts/seed/
 
+COPY --from=builder /dist/seed /
 COPY --from=builder /dist/main /
 
 # Command to run
@@ -56,8 +56,8 @@ FROM golang:alpine as production
 COPY --from=builder /app/migrations /go/migrations
 COPY --from=builder /app/seed /go/seed
 COPY --from=builder /app/Makefile /go/
-COPY --from=builder /dist/seed /go/scripts/seed/
 
+COPY --from=builder /dist/seed /
 COPY --from=builder /dist/main /
 
 # Command to run
