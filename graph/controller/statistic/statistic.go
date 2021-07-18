@@ -27,7 +27,7 @@ func (a *Statistic) GetStatistic(id string) model.Statistic {
 	var statistic model.Statistic
 
 	if res.Next() {
-		err = res.Scan(&statistic.AnimeID, &statistic.Score, &statistic.ScoredBy, &statistic.Rank, &statistic.Popularity, &statistic.Favorites, &statistic.Rating)
+		err = res.Scan(&statistic.AnimeID, &statistic.Score, &statistic.ScoredBy, &statistic.Rank, &statistic.Popularity, &statistic.Favorites)
 
 		if err != nil {
 			log.Fatal(err)
