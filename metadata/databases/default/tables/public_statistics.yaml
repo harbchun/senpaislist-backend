@@ -1,0 +1,7 @@
+table:
+  name: statistics
+  schema: public
+object_relationships:
+- name: anime
+  using:
+    foreign_key_constraint_on: anime_id

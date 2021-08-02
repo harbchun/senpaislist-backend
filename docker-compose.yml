@@ -20,23 +20,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-  pgadmin:
-    image: dpage/pgadmin4:5.3
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: postgres@email.com
-      PGADMIN_DEFAULT_PASSWORD: championsclub123
-      PGADMIN_LISTEN_PORT: 80
-    ports:
-    - "8080:80"
-    volumes:
-    - pgadmin-data:/var/lib/pgadmin
-    networks:
-      senpaislist-network:
-          aliases:
-              - pgadmin
-    links:
-    - "postgres:pgsql-server"
   backend:
     build: 
       context: .
@@ -52,10 +35,34 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+  hasura:
+    image: hasura/graphql-engine:v2.0.4.cli-migrations-v3
+    ports:
+        - "8080:8080"
+    restart: always
+    volumes:
+        - ./migrations:/hasura-migrations
+        - ./metadata:/hasura-metadata
+    environment:
+        ## this env var can be used to add the above postgres database to Hasura as a data source. this can be removed/updated based on your needs
+        HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:championsclub123@postgres:5432/postgres
+        ## enable the console served by server
+        HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
+        ## enable debugging mode. It is recommended to disable this in production
+        HASURA_GRAPHQL_DEV_MODE: "true"
+        HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+        ## uncomment next line to set an admin secret
+        # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+    networks:
+        senpaislist-network:
+            aliases:
+                - hasura
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   db_data:
-  pgadmin-data:
 
 networks:
   senpaislist-network:

@@ -1,0 +1,42 @@
+table:
+  name: animes
+  schema: public
+array_relationships:
+- name: airing_informations
+  using:
+    manual_configuration:
+      column_mapping:
+        id: anime_id
+        syoboi_tid: syoboi_tid
+      insertion_order: null
+      remote_table:
+        name: airing_informations
+        schema: public
+- name: animes_genres
+  using:
+    foreign_key_constraint_on:
+      column: anime_id
+      table:
+        name: animes_genres
+        schema: public
+- name: animes_studios
+  using:
+    foreign_key_constraint_on:
+      column: anime_id
+      table:
+        name: animes_studios
+        schema: public
+- name: statistics
+  using:
+    foreign_key_constraint_on:
+      column: anime_id
+      table:
+        name: statistics
+        schema: public
+- name: users_animes_bookmarks
+  using:
+    foreign_key_constraint_on:
+      column: anime_id
+      table:
+        name: users_animes_bookmarks
+        schema: public
