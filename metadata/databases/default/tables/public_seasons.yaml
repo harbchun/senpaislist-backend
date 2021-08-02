@@ -1,0 +1,11 @@
+table:
+  name: seasons
+  schema: public
+array_relationships:
+- name: airing_informations
+  using:
+    foreign_key_constraint_on:
+      column: season
+      table:
+        name: airing_informations
+        schema: public

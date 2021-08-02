@@ -1,0 +1,14 @@
+table:
+  name: broadcast_times
+  schema: public
+object_relationships:
+- name: airing_information
+  using:
+    manual_configuration:
+      column_mapping:
+        anime_id: anime_id
+        syoboi_tid: syoboi_tid
+      insertion_order: null
+      remote_table:
+        name: airing_informations
+        schema: public
